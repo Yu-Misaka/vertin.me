@@ -14,13 +14,6 @@ function themeFields($layout)
     $description = new Typecho_Widget_Helper_Form_Element_Text('description', NULL, NULL, _t('网页描述'), _t('简单一句话描述文章内容，用于网站 Description，有利于 SEO 优化，非必要'));
     $description->input->setAttribute('class', 'text w-100');
     $layout->addItem($description);
-    
-    // LATEX
-    $isLatex = new Typecho_Widget_Helper_Form_Element_Radio('isLatex', 
-    array(1 => _t('启用'),
-    0 => _t('关闭')),
-    0, _t('LaTeX 渲染'), _t('默认关闭增加网页访问速度，如文章内存在LaTeX语法则需要启用'));
-    $layout->addItem($isLatex);
 }
 
 function themeInit($archive)
