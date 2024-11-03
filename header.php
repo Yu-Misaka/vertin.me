@@ -93,17 +93,11 @@
     </script>
     <!-- 导入字体 -->
     <link rel="stylesheet preconnect" href="/usr/themes/PureSuck/sfonts/result.css" type="text/css" media="all" onload="this.media='all'">
-    <!-- LATEX -->
     
-    <?php if ($this->is('post') && $this->fields->isLatex == 1): ?>
-    <!--<script defer type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>-->
+    <!-- LATEX -->
     <script defer type="text/javascript" src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/KaTeX/0.15.2/katex.min.js"></script>
-    <!--<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />-->
     <link rel="stylesheet" type="text/css" href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/KaTeX/0.15.2/katex.min.css" />
-    <!--<script defer type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>-->
     <script defer type="text/javascript" src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/KaTeX/0.15.2/contrib/auto-render.min.js"></script>
-    <?php endif; ?>
-    <?php if ($this->is('post') && $this->fields->isLatex == 1): ?>
     <script type="text/javascript">
         function renderLatex() {
             renderMathInElement(document.body, {
@@ -125,7 +119,6 @@
             renderLatex();
         });
     </script>
-    <?php endif; ?>
     
     <!-- Style CSS -->
     <link rel="stylesheet" href="<?= $this->options->themeUrl('css/PureSuck_Style.css'); ?>">
@@ -237,10 +230,7 @@
                     <?php echo $this->options->PjaxScript; ?>
                 <?php endif; ?>
 
-
-                <?php if ($this->is('post') && $this->fields->isLatex == 1): ?>
-                    renderLatex();
-                <?php endif; ?>
+                renderLatex();
                 
                 // 评论区部分重载
                 if (document.querySelector('.OwO-textarea')) {
