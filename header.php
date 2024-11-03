@@ -91,6 +91,42 @@
             }
         });
     </script>
+    <!-- 导入字体 -->
+    <link rel="stylesheet preconnect" href="/usr/themes/PureSuck/sfonts/result.css" type="text/css" media="all" onload="this.media='all'">
+    <!-- LATEX -->
+    
+    <?php if ($this->is('post') && $this->fields->isLatex == 1): ?>
+    <!--<script defer type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>-->
+    <script defer type="text/javascript" src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/KaTeX/0.15.2/katex.min.js"></script>
+    <!--<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />-->
+    <link rel="stylesheet" type="text/css" href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/KaTeX/0.15.2/katex.min.css" />
+    <!--<script defer type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>-->
+    <script defer type="text/javascript" src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/KaTeX/0.15.2/contrib/auto-render.min.js"></script>
+    <?php endif; ?>
+    <?php if ($this->is('post') && $this->fields->isLatex == 1): ?>
+    <script type="text/javascript">
+        function renderLatex() {
+            renderMathInElement(document.body, {
+                delimiters: [{
+                    left: "$$",
+                    right: "$$",
+                    display: true
+                }, {
+                    left: "$",
+                    right: "$",
+                    display: false
+                }],
+                ignoredTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+                ignoredClasses: ["nokatex"]
+            });
+        }
+    
+        document.addEventListener("DOMContentLoaded", function() {
+            renderLatex();
+        });
+    </script>
+    <?php endif; ?>
+    
     <!-- Style CSS -->
     <link rel="stylesheet" href="<?= $this->options->themeUrl('css/PureSuck_Style.css'); ?>">
     <!-- 主题样式微调 -->
@@ -205,7 +241,7 @@
                 if (document.querySelector('.OwO-textarea')) {
                     initializeCommentsOwO();
                 }
-
+                
             });
         </script>
         <script defer src="<?php $this->options->themeUrl('/js/pace.min.js'); ?>"></script>
@@ -232,11 +268,6 @@
                 </p>
                 <div class="nav header-item left-side-custom-code">
                     <?= $this->options->leftSideCustomCode ?: ''; ?>
-                </div>
-                <div class="nav header-item header-credit">
-                    Powered by Typecho
-                    <br>
-                    <a href="https://github.com/MoXiaoXi233/PureSuck-theme">Theme PureSuck</a>
                 </div>
                 <nav class="nav header-item header-nav">
                     <span class="nav-item<?= $this->is('index') ? ' nav-item-current' : ''; ?>">

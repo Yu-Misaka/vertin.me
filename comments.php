@@ -40,7 +40,7 @@
                 if (preg_match('|^[1-9]\d{4,11}@qq\.com$|i', $number)) {
                     $avatarUrl = 'https://q2.qlogo.cn/headimg_dl?bs=' . $number . '&dst_uin=' . $number . '&dst_uin=' . $number . '&spec=100&url_enc=0&referer=bu_interface&term_type=PC';
                 } else {
-                    $avatarUrl = 'https://gravatar.loli.net/avatar/' . md5(strtolower($comments->mail)) . '?s=80&r=X&d=mm';
+                    $avatarUrl = 'https://cravatar.cn/avatar/' . md5(strtolower($comments->mail)) . '?s=220&r=X&d=mm';
                 }
                 ?>
                 <img class="avatarcc" src="<?php echo $avatarUrl; ?>" loading="lazy" alt="评论头像" />
