@@ -237,11 +237,16 @@
                     <?php echo $this->options->PjaxScript; ?>
                 <?php endif; ?>
 
+
+                <?php if ($this->is('post') && $this->fields->isLatex == 1): ?>
+                    renderLatex();
+                <?php endif; ?>
+                
                 // 评论区部分重载
                 if (document.querySelector('.OwO-textarea')) {
                     initializeCommentsOwO();
                 }
-                
+
             });
         </script>
         <script defer src="<?php $this->options->themeUrl('/js/pace.min.js'); ?>"></script>
