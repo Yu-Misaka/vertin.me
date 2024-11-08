@@ -123,7 +123,8 @@
     <!--代码高亮-->
     <link rel="stylesheet" href="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/11.4.0/styles/default.min.css">
     <script type="text/javascript" src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/11.4.0/highlight.min.js"></script>
-    <script type="text/javascript" charset="UTF-8" src="/lean/highlightjs-lean-master/dist/lean.min.js"></script>
+    <!-- <script type="text/javascript" charset="UTF-8" src="/lean/highlightjs-lean-master/dist/lean.min.js"></script> -->
+    <script type="text/javascript" src="https://unpkg.com/highlightjs-lean/dist/lean.min.js"></script>
     <script type="text/javascript">
         hljs.highlightAll();
     </script>
