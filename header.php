@@ -122,8 +122,8 @@
 
     <!--代码高亮-->
     <link rel="stylesheet" href="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/11.4.0/styles/default.min.css">
-    <script type="text/javascript" src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/11.4.0/highlight.min.js"></script>
-    <script type="text/javascript" charset="UTF-8" src="/usr/themes/PureSuck/lean/highlightjs-lean-master/dist/lean.min.js"></script>
+    <script defer type="text/javascript" src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/11.4.0/highlight.min.js"></script>
+    <script defer type="text/javascript" charset="UTF-8" src="/usr/themes/PureSuck/lean/highlightjs-lean-master/dist/lean.min.js"></script>
     <!-- <script type="text/javascript" src="https://unpkg.com/highlightjs-lean/dist/lean.min.js"></script> -->
     <script type="text/javascript">
         hljs.highlightAll();
@@ -162,7 +162,7 @@
     <link defer href="<?php $this->options->themeUrl('/css/MoxDesign.css'); ?>" rel="stylesheet">
     <!-- JS引入 -->
     <script defer src="<?php $this->options->themeUrl('/js/medium-zoom.min.js'); ?>"></script>
-    <script defer src="<?php $this->options->themeUrl('/js/highlight.min.js'); ?>"></script>
+    <!--<script defer src="<?php $this->options->themeUrl('/js/highlight.min.js'); ?>"></script>-->
     <script defer src="<?php $this->options->themeUrl('/js/PureSuck_Module.js'); ?>"></script>
     <script defer src="<?php $this->options->themeUrl('/js/OwO.min.js'); ?>"></script>
     <script defer src="<?php $this->options->themeUrl('/js/MoxDesign.js'); ?>"></script>
