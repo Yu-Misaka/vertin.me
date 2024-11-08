@@ -119,6 +119,13 @@
             renderLatex();
         });
     </script>
+
+    <!--代码高亮-->
+    <script type="text/javascript" src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/11.4.0/highlight.min.js"></script>
+    <script type="text/javascript" charset="UTF-8" src="/lean/highlightjs-lean-master/dist/lean.min.js"></script>
+    <script type="text/javascript">
+        hljs.highlightAll();
+    </script>
     
     <!-- Style CSS -->
     <link rel="stylesheet" href="<?= $this->options->themeUrl('css/PureSuck_Style.css'); ?>">
