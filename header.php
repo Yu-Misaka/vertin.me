@@ -227,7 +227,7 @@
                 <?php endif; ?>
 
                 renderLatex();
-                hljs.highlightAll();
+                // hljs.highlightAll();
                 
                 // 评论区部分重载
                 if (document.querySelector('.OwO-textarea')) {
