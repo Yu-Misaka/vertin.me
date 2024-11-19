@@ -129,6 +129,7 @@
     <!-- <script type="text/javascript" src="https://unpkg.com/highlightjs-lean/dist/lean.min.js"></script> -->
     <script type="text/javascript">
         hljs.highlightAll();
+        hljs.initLineNumbersOnLoad();
     </script>
 
     <!-- Style CSS -->
