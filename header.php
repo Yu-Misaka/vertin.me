@@ -121,8 +121,8 @@
     </script>
 
     <!--代码高亮-->
-    <!--Darcula theme-->
-    <link rel="stylesheet" href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/11.4.0/styles/base16/darcula.min.css">
+    <!--a11y theme-->
+    <link rel="stylesheet" href="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/11.4.0/styles/a11y-dark.min.css">
     <!--Highlight.js-->
     <script defer type="text/javascript" src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/11.4.0/highlight.min.js"></script>
     <!--Lean-->
