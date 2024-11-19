@@ -121,8 +121,6 @@
     </script>
 
     <!--代码高亮-->
-    <!--a11y theme-->
-    <link rel="stylesheet" href="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/11.4.0/styles/a11y-dark.min.css">
     <!--Highlight.js-->
     <script defer type="text/javascript" src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/11.4.0/highlight.min.js"></script>
     <!--Lean-->
@@ -161,7 +159,7 @@
     <!-- ICON Setting -->
     <link rel="icon" href="<?= isset($this->options->logoUrl) && $this->options->logoUrl ? $this->options->logoUrl : $this->options->themeUrl . '/images/avatar.ico'; ?>" type="image/x-icon">
     <!-- CSS引入 -->
-    <!--<link href="<?php $this->options->themeUrl('/css/a11y-dark.min.css'); ?>" rel="stylesheet">-->
+    <link href="<?php $this->options->themeUrl('/css/a11y-dark.min.css'); ?>" rel="stylesheet">
     <link href="<?php $this->options->themeUrl('/css/PureSuck_Module.css'); ?>" rel="stylesheet">
     <link href="<?php $this->options->themeUrl('/css/aos.css'); ?>" rel="stylesheet">
     <link defer href="<?php $this->options->themeUrl('/css/MoxDesign.css'); ?>" rel="stylesheet">
