@@ -121,15 +121,13 @@
     </script>
 
     <!--代码高亮-->
-    <link rel="stylesheet" href="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/11.4.0/styles/a11y-dark.min.css">
+    <link rel="stylesheet" href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/11.4.0/styles/base16/darcula.min.css">
     <script defer type="text/javascript" src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/11.4.0/highlight.min.js"></script>
-    <script defer type="text/javascript" src="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
     <script defer type="text/javascript" charset="UTF-8" src="/usr/themes/PureSuck/lean/highlightjs-lean-master/dist/lean.min.js"></script>
     <script defer type="text/javascript" charset="UTF-8" src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/11.4.0/languages/mathematica.min.js"></script>
     <!-- <script type="text/javascript" src="https://unpkg.com/highlightjs-lean/dist/lean.min.js"></script> -->
     <script type="text/javascript">
         hljs.highlightAll();
-        hljs.initLineNumbersOnLoad();
     </script>
 
     <!-- Style CSS -->
