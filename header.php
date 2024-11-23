@@ -163,8 +163,10 @@
     <link href="<?php $this->options->themeUrl('/css/PureSuck_Module.css'); ?>" rel="stylesheet">
     <link href="<?php $this->options->themeUrl('/css/aos.css'); ?>" rel="stylesheet">
     <link defer href="<?php $this->options->themeUrl('/css/MoxDesign.css'); ?>" rel="stylesheet">
+    <link href="<?php $this->options->themeUrl('/css/APlayer.min.css'); ?>" rel="stylesheet">
     <!-- JS引入 -->
     <script defer src="<?php $this->options->themeUrl('/js/medium-zoom.min.js'); ?>"></script>
+    <script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/aplayer/1.10.1/APlayer.min.js"></script>
     <!--<script defer src="<?php $this->options->themeUrl('/js/highlight.min.js'); ?>"></script>-->
     <script defer src="<?php $this->options->themeUrl('/js/PureSuck_Module.js'); ?>"></script>
     <script defer src="<?php $this->options->themeUrl('/js/OwO.min.js'); ?>"></script>
@@ -283,6 +285,24 @@
                     <button class="theme-toggle" onclick="toggleTheme()" aria-label="日夜切换">
                         <span id="theme-icon"></span>
                     </button>
+                </div>
+                <div style="color:#1d1f20" class="nav header-item left-side-custom-code">
+                    &emsp;
+                </div>
+                <div style="text-align:left" id="aplayer">
+                    <script type="text/javascript">
+                        const ap = new APlayer({
+                        //定义容器
+                        container: document.getElementById('aplayer'),
+                        theme: '#bf763f',
+                        listFolded: true,
+                        listMaxHeight: 90,
+                        //关于音频的相关参数：
+                        audio: [
+                            {name: 'The Full Mix (Bonus Track)',url: '/usr/themes/PureSuck/playlist/10.-The-Full-Mix-Bonus-Track.mp3',cover: '/usr/themes/PureSuck/playlist/00.-2-Mello-Superliminal-The-Lo-Fi-Mix.webp'},
+                            {name: 'Strange Worlds',url: '/usr/themes/PureSuck/playlist/Laryssa-Okada-Manifold-Garden-Original-Soundtrack-26-Strange-Worlds.mp3',cover: '/usr/themes/PureSuck/playlist/Laryssa-Okada-Manifold-Garden-Original-Soundtrack-26-Strange-Worlds-mp3-image.webp'},
+                        ]});
+                    </script>
                 </div>
             </div>
         </header>

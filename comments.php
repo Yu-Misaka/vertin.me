@@ -7,12 +7,12 @@
     function threadedComments($comments, $options)
     {
         $cl = $comments->levels > 0 ? 'c_c' : 'c_p';
-        $isAdmin = $comments->authorId === 1; // 判断评论者是否是站长
+        $isAdmin = $comments->authorId == 1; // 判断评论者是否是站长
         $author = $comments->url ? '<a href="' . $comments->url . '" target="_blank" rel="external nofollow">' . $comments->author . '</a>' : $comments->author;
     ?>
         <li id="li-<?php $comments->theId(); ?>" class="<?php echo $cl; ?>">
             <div id="<?php $comments->theId(); ?>">
-                <?php $avatarUrl = 'https://cn.cravatar.com/avatar/' . md5(strtolower($comments->mail)) . '?s=128&d=mm'; ?>
+                <?php $avatarUrl = 'https://weavatar.com/avatar/'.md5(strtolower($comments->mail)).'?s=220&d=mm'; ?>
                 <img class="avatarcc" src="<?php echo $avatarUrl; ?>" loading="lazy" alt="评论头像" />
                 <div class="cp">
                     <?php echo parseOwOcodes($comments->content); ?>
