@@ -10,10 +10,6 @@ function themeFields($layout)
     $desc = new Typecho_Widget_Helper_Form_Element_Text('desc', NULL, NULL, _t('文章摘要'), _t('文章摘要信息，会显示在首页文章卡片内，为空则默认显示文章开头一段文字'));
     $desc->input->setAttribute('class', 'text w-100');
     $layout->addItem($desc);
-
-    $description = new Typecho_Widget_Helper_Form_Element_Text('description', NULL, NULL, _t('网页描述'), _t('简单一句话描述文章内容，用于网站 Description，有利于 SEO 优化，非必要'));
-    $description->input->setAttribute('class', 'text w-100');
-    $layout->addItem($description);
 }
 
 function themeInit($archive)
@@ -126,7 +122,7 @@ function themeConfig($form)
         }
     }
     echo '
-    <h3>当前主题版本：<span style="color: #b45864;">1.2.4</span></h3>
+    <h3>当前主题版本：<span style="color: #b45864;">1.2.5</span></h3>
     <h4>主题开源页面及文档：<span style="color: #b45864;"><a href="https://github.com/MoXiaoXi233/PureSuck-theme" style="color: #3273dc; text-decoration: none;">PureSuck-theme</a></span></h4>
     <h5>*备份功能只在 SQL 环境下测试正常，遇到问题请清空配置重新填写*</h5>
     <form class="protected home" action="?' . $name . 'bf" method="post">
@@ -553,7 +549,7 @@ function parse_Shortcodes($content)
         // 如果 alt 属性不为空，则添加注释
         if (!empty($alt)) {
             // 将图片标签替换为带有注释的图片标签
-            return '<figure>' . $matches[0] . '<figcaption>' . $alt . '</figcaption></figure>';
+            return '<figure data-aos="fade-up" data-aos-anchor-placement="top-bottom" data-aos-delay="85">' . $matches[0] . '<figcaption>' . $alt . '</figcaption></figure>';
         }
 
         // 如果没有 alt 属性，直接返回原图片标签
