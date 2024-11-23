@@ -2079,6 +2079,7 @@ textarea.ci {
 		url('../fonts/fontello.svg?3760722#fontello') format('svg');
 	font-weight: normal;
 	font-style: normal;
+	font-display: fallback;
 }
 
 /* Chrome hack: SVG is rendered more smooth in Windozze. 100% magic, uncomment if you need it. */
