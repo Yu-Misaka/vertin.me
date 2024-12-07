@@ -91,6 +91,7 @@
             }
         });
     </script>
+    <link rel="preconnect" href="https://vertin.obs.myhuaweicloud.com">
     <!-- 导入字体 -->
     <link rel="stylesheet preconnect" href="https://vertin.obs.myhuaweicloud.com/vertin.me/fonts/result.css" type="text/css" media="all" onload="this.media='all'">
     
@@ -127,10 +128,6 @@
     <script defer type="text/javascript" charset="UTF-8" src="/usr/themes/PureSuck/lean/highlightjs-lean-master/dist/lean.min.js"></script>
     <!--Mathematica-->
     <script defer type="text/javascript" charset="UTF-8" src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/11.4.0/languages/mathematica.min.js"></script>
-    <!-- <script type="text/javascript" src="https://unpkg.com/highlightjs-lean/dist/lean.min.js"></script> -->
-    <script type="text/javascript">
-        hljs.highlightAll();
-    </script>
 
     <!-- Style CSS -->
     <link rel="stylesheet" href="<?= $this->options->themeUrl('css/PureSuck_Style.css'); ?>">
