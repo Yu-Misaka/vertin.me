@@ -91,7 +91,7 @@
             }
         });
     </script>
-    <link rel="preconnect" href="https://vertin.obs.myhuaweicloud.com">
+    <link rel="preconnect" href="https://vertin.obs.myhuaweicloud.com" crossorigin>
     <!-- 导入字体 -->
     <link rel="stylesheet preconnect" href="https://vertin.obs.myhuaweicloud.com/vertin.me/fonts/result.css" type="text/css" media="all" onload="this.media='all'">
     
