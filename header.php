@@ -92,7 +92,7 @@
         });
     </script>
     <!-- 导入字体 -->
-    <link rel="stylesheet preconnect" href="/usr/themes/PureSuck/sfonts/result.css" type="text/css" media="all" onload="this.media='all'">
+    <link rel="stylesheet preconnect" href="https://vertin.obs.myhuaweicloud.com/vertin.me/fonts/result.css" type="text/css" media="all" onload="this.media='all'">
     
     <!-- LATEX -->
     <script defer type="text/javascript" src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/KaTeX/0.15.2/katex.min.js"></script>
@@ -299,8 +299,8 @@
                         listMaxHeight: 90,
                         //关于音频的相关参数：
                         audio: [
-                            {name: 'The Full Mix (Bonus Track)',url: '/usr/themes/PureSuck/playlist/10.-The-Full-Mix-Bonus-Track.mp3',cover: '/usr/themes/PureSuck/playlist/00.-2-Mello-Superliminal-The-Lo-Fi-Mix.webp'},
-                            {name: 'Strange Worlds',url: '/usr/themes/PureSuck/playlist/Laryssa-Okada-Manifold-Garden-Original-Soundtrack-26-Strange-Worlds.mp3',cover: '/usr/themes/PureSuck/playlist/Laryssa-Okada-Manifold-Garden-Original-Soundtrack-26-Strange-Worlds-mp3-image.webp'},
+                            {name: 'The Full Mix (Bonus Track)',url: 'https://vertin.obs.myhuaweicloud.com/vertin.me/playlist/10.-The-Full-Mix-Bonus-Track.mp3',cover: 'https://vertin.obs.myhuaweicloud.com/vertin.me/playlist/00.-2-Mello-Superliminal-The-Lo-Fi-Mix.webp'},
+                            {name: 'Strange Worlds',url: 'https://vertin.obs.myhuaweicloud.com/vertin.me/playlist/Laryssa-Okada-Manifold-Garden-Original-Soundtrack-26-Strange-Worlds.mp3',cover: 'https://vertin.obs.myhuaweicloud.com/vertin.me/playlist/Laryssa-Okada-Manifold-Garden-Original-Soundtrack-26-Strange-Worlds-mp3-image.webp'},
                         ]});
                     </script>
                 </div>
