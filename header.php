@@ -92,11 +92,11 @@
         });
     </script>
     <!-- 导入字体 -->
-    <link defer rel="stylesheet preconnect" href="https://vertin.obs.myhuaweicloud.com/vertin.me/fonts/result.css.gz" type="text/css" media="all" onload="this.media='all'">
+    <link defer rel="stylesheet" href="https://vertin.obs.myhuaweicloud.com/vertin.me/fonts/result.css.gz" type="text/css" media="all" onload="this.media='all'">
     
     <!-- LATEX -->
     <script defer type="text/javascript" src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/KaTeX/0.15.2/katex.min.js"></script>
-    <link defer rel="stylesheet" type="text/css" href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/KaTeX/0.15.2/katex.min.css" />
+    <link defer rel="stylesheet" type="text/css" href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/KaTeX/0.15.2/katex.min.css" />
     <script defer type="text/javascript" src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/KaTeX/0.15.2/contrib/auto-render.min.js"></script>
     <script defer type="text/javascript">
         function renderLatex() {
