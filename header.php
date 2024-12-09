@@ -92,6 +92,7 @@
         });
     </script>
     <!-- 导入字体 -->
+    <link rel="preconnect" href="https://vertin.obs.myhuaweicloud.com" />
     <link defer rel="stylesheet" href="<?php $this->options->themeUrl('/css/result.css'); ?>" type="text/css" media="all" onload="this.media='all'">
     
     <!-- LATEX -->
