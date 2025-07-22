@@ -300,9 +300,17 @@
                         audio: [
                             {name: 'The Full Mix (Bonus Track)',url: 'https://cdn.academe.city/vertin.me/playlist/10.-The-Full-Mix-Bonus-Track.mp3',cover: 'https://cdn.academe.city/vertin.me/playlist/00.-2-Mello-Superliminal-The-Lo-Fi-Mix.webp'},
                             {name: 'Strange Worlds',url: 'https://cdn.academe.city/vertin.me/playlist/Laryssa-Okada-Manifold-Garden-Original-Soundtrack-26-Strange-Worlds.mp3',cover: 'https://cdn.academe.city/vertin.me/playlist/Laryssa-Okada-Manifold-Garden-Original-Soundtrack-26-Strange-Worlds-mp3-image.webp'},
+                            {name: 'Animenz-Only-my-railgun-某科学的超电磁炮-OP1',url: 'https://cdn.academe.city/vertin.me/playlist/Animenz-Only-my-railgun-某科学的超电磁炮-OP1.mp3', cover: 'http://cdn.academe.city/vertin.me/playlist/Animenz-Only-my-railgun-某科学的超电磁炮-OP1-mp3-image.webp'},
+                            {name: '08M34-End-Credit-Day-One', url: 'http://cdn.academe.city/vertin.me/playlist/Hans-Zimmer-08M34-End-Credit-Day-One-v10.03-／-End-Credit-2-Day-One-v7.09-／-End-Credit-3-08M32.mp3', cover: 'http://cdn.academe.city/vertin.me/playlist/Hans-Zimmer-08M34-End-Credit-Day-One-v10-03-／-End-Credit-2-Day-One-v7-09-／-End-Credit-3-08M32-mp3-image.webp'},
                         ]});
                     </script>
                 </div>
+                <style>
+                    .aplayer .aplayer-list {
+                        max-height: 96px !important;
+                        overflow-y: auto !important;
+                    }
+                </style>
             </div>
         </header>
         <main class="main">
