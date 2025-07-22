@@ -122,6 +122,7 @@
     </script>
 
     <!-- Style CSS -->
+    <link rel="stylesheet" href="<?= $this->options->themeUrl('css/fontello.css'); ?>">
     <link rel="stylesheet" href="<?= $this->options->themeUrl('css/PureSuck_Style.css'); ?>">
     <!-- 主题样式微调 -->
     <!-- 标题线条 -->
@@ -144,17 +145,17 @@
         </style>
     <?php endif; ?>
     <!-- AOS -->
-    <script defer src="<?php $this->options->themeUrl('/js/aos.js'); ?>"></script>
+    <script defer src="<?php getStaticURL("aos.js") ?>"></script>
     <!-- ICON Setting -->
     <link rel="icon" href="<?= isset($this->options->logoUrl) && $this->options->logoUrl ? $this->options->logoUrl : $this->options->themeUrl . '/images/avatar.ico'; ?>" type="image/x-icon">
     <!-- CSS引入 -->
-    <link href="<?php $this->options->themeUrl('/css/a11y-dark.min.css'); ?>" rel="stylesheet">
+    <link href="<?php getStaticURL('a11y-dark.min.css'); ?>" rel="stylesheet">
     <link href="<?php $this->options->themeUrl('/css/PureSuck_Module.css'); ?>" rel="stylesheet">
-    <link href="<?php $this->options->themeUrl('/css/aos.css'); ?>" rel="stylesheet">
+    <link href="<?php getStaticURL('aos.css'); ?>" rel="stylesheet">
     <link defer href="<?php $this->options->themeUrl('/css/MoxDesign.css'); ?>" rel="stylesheet">
     <link href="<?php $this->options->themeUrl('/css/APlayer.min.css'); ?>" rel="stylesheet">
     <!-- JS引入 -->
-    <script defer src="<?php $this->options->themeUrl('/js/medium-zoom.min.js'); ?>"></script>
+    <script defer src="<?php getStaticURL('medium-zoom.min.js'); ?>"></script>
     <script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/aplayer/1.10.1/APlayer.min.js"></script>
     <script defer type="text/javascript" src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/11.4.0/highlight.min.js"></script>
     <script defer type="text/javascript" charset="UTF-8" src="/usr/themes/PureSuck/lean/highlightjs-lean-master/dist/lean.min.js"></script>
@@ -164,7 +165,7 @@
     <script defer src="<?php $this->options->themeUrl('/js/MoxDesign.js'); ?>"></script>
     <!-- Pjax -->
     <?php if ($this->options->enablepjax == '1'): ?>
-        <script defer src="<?php $this->options->themeUrl('/js/pjax.min.js'); ?>"></script>
+        <script defer src="<?php getStaticURL('pjax.min.js'); ?>"></script>
         <script type="text/javascript">
             document.addEventListener('DOMContentLoaded', function() {
                 var pjax = new Pjax({
@@ -230,8 +231,8 @@
                 Comments_Submit();
             });
         </script>
-        <script defer src="<?php $this->options->themeUrl('/js/pace.min.js'); ?>"></script>
-        <link rel="stylesheet" href="<?php $this->options->themeUrl('/css/pace-theme-default.min.css'); ?>">
+        <script defer src="<?php getStaticURL('pace.min.js'); ?>"></script>
+        <link rel="stylesheet" href="<?php getStaticURL('pace-theme-default.min.css'); ?>">
     <?php else: ?>
         <!-- 是不是 Pjax 有 bug，哈哈哈 --kissablecho -->
         <!-- 没错我差点死在自己留的鬼判定了--MoXi -->
@@ -243,9 +244,16 @@
     <div class="wrapper">
         <header class="header" data-js="header">
             <div class="wrapper header-wrapper header-title">
-                <span class="el-avatar el-avatar--circle">
-                    <img src="<?= $this->options->logoIndex; ?>" style="object-fit:cover;" alt="博主头像" width="120" height="120">
-                </span>
+                <a href="<?= $this->options->logoIndexUrl ?: $this->options->siteUrl; ?>" class="avatar-link" aria-label="博主名字">
+                    <span class="el-avatar el-avatar--circle avatar-hover-effect">
+                        <img src="<?= $this->options->logoIndex; ?>"
+                            style="object-fit:cover;"
+                            alt="博主头像"
+                            width="120"
+                            height="120"
+                            data-name="博主名字">
+                    </span>
+                </a>
                 <div class="header-title">
                     <?= $this->options->titleIndex(); ?>
                 </div>
@@ -298,4 +306,3 @@
             </div>
         </header>
         <main class="main">
-            

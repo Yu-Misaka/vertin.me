@@ -122,7 +122,7 @@ function themeConfig($form)
         }
     }
     echo '
-    <h3>当前主题版本：<span style="color: #b45864;">1.2.5</span></h3>
+    <h3>当前主题版本：<span style="color: #b45864;">1.2.6</span></h3>
     <h4>主题开源页面及文档：<span style="color: #b45864;"><a href="https://github.com/MoXiaoXi233/PureSuck-theme" style="color: #3273dc; text-decoration: none;">PureSuck-theme</a></span></h4>
     <h5>*备份功能只在 SQL 环境下测试正常，遇到问题请清空配置重新填写*</h5>
     <form class="protected home" action="?' . $name . 'bf" method="post">
@@ -157,6 +157,16 @@ function themeConfig($form)
         _t('填写 JPG/PNG/Webp 等图片 URL 地址, 网站左侧头像的显示 (512*512最佳) ')
     );
     $form->addInput($logoIndex);
+
+    // 左侧 Logo 跳转链接 配置项
+    $logoIndexUrl = new \Typecho\Widget\Helper\Form\Element\Text(
+        'logoIndexUrl',
+        null,
+        null,
+        _t('LOGO 跳转 地址'),
+        _t('点击头像时候跳转的网址，可以设置为引导页等，为空则为博客首页')
+    );
+    $form->addInput($logoIndexUrl);
 
     //作者头像
     $authorAvatar = new \Typecho\Widget\Helper\Form\Element\Text(
@@ -197,6 +207,19 @@ function themeConfig($form)
         _t('位于Footer，在这里填入JavaScript代码，需要包含&lt;script&gt;标签！，不要填除了脚本外的其他内容，否则会造成样式错误！<br>如果开启了 Pjax 功能，请自行在 header.php 配置回调函数或者尝试寻求帮助')
     );
     $form->addInput($footerScript);
+
+    $staticCdn = new Typecho_Widget_Helper_Form_Element_Radio(
+        'staticCdn',
+        array(
+            'local' => _t('本地'),
+            'bootcdn' => _t('BootCDN'),
+            'cdnjs' => _t('CDNJS'),
+        ),
+        'local',
+        _t("主题静态资源 CDN"),
+        _t("静态资源 CDN 源选择，默认为本地")
+    );
+    $form->addInput($staticCdn);
 
     // 网页底部信息
     $footerInfo = new \Typecho\Widget\Helper\Form\Element\Textarea(
@@ -300,6 +323,15 @@ function themeConfig($form)
     );
     $form->addInput($showTag);
 
+    // 文章页显示字数信息选项
+    $showWordCount = new Typecho_Widget_Helper_Form_Element_Radio(
+        'showWordCount',
+        array('1' => _t('显示'), '0' => _t('隐藏')),
+        '1',
+        _t('是否在文章开头显示字数和预计阅读时间')
+    );
+    $form->addInput($showWordCount);
+
     // 文章页显示版权信息选项
     $showCopyright = new Typecho_Widget_Helper_Form_Element_Radio(
         'showCopyright',
@@ -308,7 +340,6 @@ function themeConfig($form)
         _t('是否在文章页尾显示版权信息')
     );
     $form->addInput($showCopyright);
-
 
     // 代码高亮设置
     $codeBlockSettings = new Typecho_Widget_Helper_Form_Element_Checkbox(
@@ -345,12 +376,66 @@ function getColorScheme()
     return $colorScheme;
 }
 
+function getStaticURL($path)
+{
+    $options = Typecho_Widget::widget('Widget_Options');
+    $staticCdn = $options->staticCdn;
+
+    // ===================== CDN 映射表 =====================
+    $staticMap = [
+        // 本地资源（主题目录）
+        'local' => [
+            'aos.js'            => $options->themeUrl . '/js/lib/aos.js',
+            'aos.css'           => $options->themeUrl . '/css/lib/aos.css',
+            'a11y-dark.min.css' => $options->themeUrl . '/css/lib/a11y-dark.min.css',
+            'medium-zoom.min.js' => $options->themeUrl . '/js/lib/medium-zoom.min.js',
+            'highlight.min.js'  => $options->themeUrl . '/js/lib/highlight.min.js',
+            'pjax.min.js'       => $options->themeUrl . '/js/lib/pjax.min.js',
+            'pace.min.js'       => $options->themeUrl . '/js/lib/pace.min.js',
+            'pace-theme-default.min.css' => $options->themeUrl . '/css/lib/pace-theme-default.min.css'
+        ],
+        'bootcdn' => [
+            'aos.js'            => "https://cdn.bootcdn.net/ajax/libs/aos/2.3.4/aos.js",
+            'aos.css'           => "https://cdn.bootcdn.net/ajax/libs/aos/2.3.4/aos.css",
+            'a11y-dark.min.css' => "https://cdn.bootcdn.net/ajax/libs/highlight.js/11.10.0/styles/a11y-dark.min.css",
+            'medium-zoom.min.js' => "https://cdn.bootcdn.net/ajax/libs/medium-zoom/1.1.0/medium-zoom.min.js",
+            'highlight.min.js'  => "https://cdn.bootcdn.net/ajax/libs/highlight.js/11.10.0/highlight.min.js",
+            'pjax.min.js'       => "https://cdn.bootcdn.net/ajax/libs/pjax/0.2.8/pjax.min.js",
+            'pace.min.js'       => 'https://cdn.bootcdn.net/ajax/libs/pace/1.2.4/pace.min.js',
+            'pace-theme-default.min.css' => "https://cdn.bootcdn.net/ajax/libs/pace/1.2.4/pace-theme-default.min.css"
+        ],
+        "cdnjs" => [
+            'aos.js'            => "https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js",
+            'aos.css'           => "https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css",
+            'a11y-dark.min.css' => "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/a11y-dark.min.css",
+            'medium-zoom.min.js' => "https://cdnjs.cloudflare.com/ajax/libs/medium-zoom/1.1.0/medium-zoom.min.js",
+            'highlight.min.js'  => "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js",
+            'pjax.min.js'       => "https://cdnjs.cloudflare.com/ajax/libs/pjax/0.2.8/pjax.min.js",
+            'pace.min.js'       => 'https://cdnjs.cloudflare.com/ajax/libs/pace/1.2.4/pace.min.js',
+            'pace-theme-default.min.css' => "https://cdnjs.cloudflare.com/ajax/libs/pace/1.2.4/pace-theme-default.min.css"
+        ]
+
+    ];
+
+    // ===================== 路径生成逻辑 =====================
+    if ($staticCdn === 'local') {
+        // 本地模式直接返回映射路径
+        echo $staticMap['local'][$path];
+    } elseif (isset($staticMap[$staticCdn][$path])) {
+        // CDN 模式且存在映射时返回CDN地址
+        echo $staticMap[$staticCdn][$path];
+    } else {
+        // 其他情况回退到主题默认路径
+        echo $staticMap['local'][$path];
+    }
+}
+
 function generateDynamicCSS()
 {
     // 获取颜色方案
     $colorScheme = getColorScheme();
 
-        // 定义颜色映射数组
+    // 定义颜色映射数组
     $colorMap = [
         'pink' => ['theme' => '#ea868f', 'hover' => '#DB2777'],  // 粉色
         'green' => ['theme' => '#48c774', 'hover' => '#15803d'], // 绿色
@@ -372,14 +457,14 @@ function generateDynamicCSS()
 
     // 深色模式颜色映射数组
     $darkColorMap = [
-         'pink' => ['theme' => '#b45864', 'hover' => '#d72b6f'],
-         'green' => ['theme' => '#2e7c55', 'hover' => '#0f6933'],
-         'blue' => ['theme' => '#2855b0', 'hover' => '#1f55e6'],
-         'yellow' => ['theme' => '#bf763f', 'hover' => '#934109'],
-         'red' => ['theme' => '#b91c1c', 'hover' => '#991b1b'],    // 暗红色
-         'purple' => ['theme' => '#6d28d9', 'hover' => '#5b21b6'], // 暗紫色
-         'cyan' => ['theme' => '#0e7490', 'hover' => '#155e75'],   // 暗青色
-         'orange' => ['theme' => '#c2410c', 'hover' => '#9a3412'], // 暗橙色
+        'pink' => ['theme' => '#b45864', 'hover' => '#d72b6f'],
+        'green' => ['theme' => '#2e7c55', 'hover' => '#0f6933'],
+        'blue' => ['theme' => '#2855b0', 'hover' => '#1f55e6'],
+        'yellow' => ['theme' => '#bf763f', 'hover' => '#934109'],
+        'red' => ['theme' => '#b91c1c', 'hover' => '#991b1b'],    // 暗红色
+        'purple' => ['theme' => '#6d28d9', 'hover' => '#5b21b6'], // 暗紫色
+        'cyan' => ['theme' => '#0e7490', 'hover' => '#155e75'],   // 暗青色
+        'orange' => ['theme' => '#c2410c', 'hover' => '#9a3412'], // 暗橙色
     ];
 
     // 根据颜色方案设置 dark 模式下的主题颜色和悬停颜色
@@ -401,6 +486,15 @@ function generateDynamicCSS()
     </style>';
 }
 
+function getMarkdownCharacters($content)
+{
+    $content = trim($content); // 去除 HTML 标签
+    // 使用正则表达式匹配并去除代码块（包括 ``` 包裹的代码块和行内代码块）
+    $content = preg_replace('/```[\s\S]*?```/m', '', $content); // 去除多行代码块
+    $wordCount = mb_strlen($content, 'UTF-8'); // 计算字数
+    return $wordCount;
+}
+
 function allOfCharacters()
 {
     $chars = 0;
@@ -408,7 +502,7 @@ function allOfCharacters()
     $select = $db->select('text')->from('table.contents');
     $rows = $db->fetchAll($select);
     foreach ($rows as $row) {
-        $chars += mb_strlen(trim($row['text']), 'UTF-8');
+        $chars += getMarkdownCharacters($row['text']);
     }
     $unit = '';
     if ($chars >= 10000) {
