@@ -96,9 +96,9 @@
     <link defer rel="stylesheet" href="<?php $this->options->themeUrl('/css/result.css'); ?>" type="text/css" media="all" onload="this.media='all'">
     
     <!-- LATEX -->
-    <script defer type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
-    <link defer rel="stylesheet" type="text/css" href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.9/katex.min.css" />
-    <script defer type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+    <script defer type="text/javascript" src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+    <link defer rel="stylesheet" type="text/css" href="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/KaTeX/0.16.9/katex.min.css" />
+    <script defer type="text/javascript" src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
     <script defer type="text/javascript">
         function renderLatex() {
             renderMathInElement(document.body, {
@@ -156,10 +156,10 @@
     <link href="<?php $this->options->themeUrl('/css/APlayer.min.css'); ?>" rel="stylesheet">
     <!-- JS引入 -->
     <script defer src="<?php getStaticURL('medium-zoom.min.js'); ?>"></script>
-    <script src="https://cdn.bootcdn.net/ajax/libs/aplayer/1.10.1/APlayer.min.js"></script>
-    <script defer type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+    <script src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/aplayer/1.10.1/APlayer.min.js"></script>
+    <script defer type="text/javascript" src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
     <script defer type="text/javascript" charset="UTF-8" src="/usr/themes/PureSuck/lean/highlightjs-lean-master/dist/lean.min.js"></script>
-    <script defer type="text/javascript" charset="UTF-8" src="https://cdn.bootcdn.net/ajax/libs/highlight.js/11.11.1/languages/mathematica.min.js"></script>
+    <script defer type="text/javascript" charset="UTF-8" src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/highlight.js/11.11.1/languages/mathematica.min.js"></script>
     <script defer src="<?php $this->options->themeUrl('/js/PureSuck_Module.js'); ?>"></script>
     <script defer src="<?php $this->options->themeUrl('/js/OwO.min.js'); ?>"></script>
     <script defer src="<?php $this->options->themeUrl('/js/MoxDesign.js'); ?>"></script>
