@@ -149,7 +149,7 @@
     <!-- ICON Setting -->
     <link rel="icon" href="<?= isset($this->options->logoUrl) && $this->options->logoUrl ? $this->options->logoUrl : $this->options->themeUrl . '/images/avatar.ico'; ?>" type="image/x-icon">
     <!-- CSS引入 -->
-    <link href="<?php getStaticURL('a11y-dark.min.css'); ?>" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.academe.city/vertin.me/lib/a11y-dark.min.css">
     <link href="<?php $this->options->themeUrl('/css/PureSuck_Module.css'); ?>" rel="stylesheet">
     <link href="<?php getStaticURL('aos.css'); ?>" rel="stylesheet">
     <link defer href="<?php $this->options->themeUrl('/css/MoxDesign.css'); ?>" rel="stylesheet">
@@ -158,7 +158,7 @@
     <script defer src="<?php getStaticURL('medium-zoom.min.js'); ?>"></script>
     <script src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/aplayer/1.10.1/APlayer.min.js"></script>
     <script defer type="text/javascript" src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
-    <script defer type="text/javascript" charset="UTF-8" src="/usr/themes/PureSuck/lean/highlightjs-lean-master/dist/lean.min.js"></script>
+    <script defer type="text/javascript" charset="UTF-8" src="https://cdn.academe.city/vertin.me/lib/lean.min.js"></script>
     <script defer type="text/javascript" charset="UTF-8" src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/highlight.js/11.11.1/languages/mathematica.min.js"></script>
     <script defer src="<?php $this->options->themeUrl('/js/PureSuck_Module.js'); ?>"></script>
     <script defer src="<?php $this->options->themeUrl('/js/OwO.min.js'); ?>"></script>
