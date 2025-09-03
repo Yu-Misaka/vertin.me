@@ -231,7 +231,7 @@
                 Comments_Submit();
             });
         </script>
-        <script defer src="<?php getStaticURL('pace.min.js'); ?>"></script>
+        <script defer data-pace-options='{ "eventLag": false }' src="<?php getStaticURL('pace.min.js'); ?>"></script>
         <link rel="stylesheet" href="<?php getStaticURL('pace-theme-default.min.css'); ?>">
     <?php else: ?>
         <!-- 是不是 Pjax 有 bug，哈哈哈 --kissablecho -->
