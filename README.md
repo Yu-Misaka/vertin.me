@@ -2,7 +2,8 @@
 # PureSuck-Theme
 ![Static Badge](https://img.shields.io/github/v/release/MoXiaoXi233/PureSuck-theme)
 ![Static Badge](https://img.shields.io/badge/LICENSE-MIT-green)
-![Static Badge](https://img.shields.io/badge/AUTHOR-MoXiify-pink)  
+![Static Badge](https://img.shields.io/badge/AUTHOR-MoXiify-pink)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/Yu-Misaka/vertin.me)  
 PureSuck，干净，纯洁，淡雅朴素的typecho主题。  
 由于是第一次正经意义上的做一个项目，遇到问题欢迎反馈解决。  
 另外主题样式和基调还在不断迭代中，可能会遇到版本更新后样式发生变化的情况  
