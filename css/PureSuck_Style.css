@@ -435,7 +435,7 @@ small {
 
 }
 
-@media (min-width:1400px) {
+@media (min-width:1503px) {
 
 	.root,
 	html {
@@ -863,11 +863,11 @@ body>.wrapper {
 	body>.wrapper {
 		max-width: 1700px;
 		padding-left: 0px;
-		padding-right: 299px;
+		padding-right: 328px;
 	}
 }
 
-@media (min-width: 1400px) {
+@media (min-width: 1503px) {
 	body>.wrapper {
 		padding-left: 35px;
 		padding-right: 365px;
@@ -940,11 +940,10 @@ body>.wrapper {
 	.header {
 		position: fixed;
 		width: 328px;
-		padding-top: 25px;
-		padding-right: 56px;
+		padding-top: 50px;
+		padding-right: 40px;
 		padding-bottom: 40px;
 		margin-right: -328px;
-		padding-left: 35px;
 	}
 
 	.header-wrapper {
@@ -981,11 +980,10 @@ body>.wrapper {
 
 }
 
-@media (min-width:1400px) {
+@media (min-width:1503px) {
 	.header {
 		position: fixed;
 		width: 344px;
-		padding-top: 50px;
 		padding-right: 50px;
 		padding-bottom: 50px;
 		margin-right: -344px;
@@ -1032,9 +1030,9 @@ body>.wrapper {
 
 @media (min-width:1183px) {
 	.main {
-		padding-top: 25px;
+		padding-top: 50px;
 		padding-bottom: 112px;
-		padding-left: 299px
+		padding-left: 325px
 	}
 
 	.main-pager {
@@ -1042,7 +1040,7 @@ body>.wrapper {
 	}
 }
 
-@media (min-width:1400px) {
+@media (min-width:1503px) {
 	.main {
 		padding-top: 50px;
 		padding-bottom: 112px;
@@ -1265,7 +1263,7 @@ body>.wrapper {
 	}
 }
 
-@media (min-width:1400px) {
+@media (min-width:1503px) {
 	.post {
 		margin-bottom: 55px
 	}
@@ -1382,7 +1380,7 @@ body>.wrapper {
 	}
 }
 
-@media (min-width:1400px) {
+@media (min-width:1503px) {
 	.post--small+.post--small {
 		margin-bottom: 57px
 	}

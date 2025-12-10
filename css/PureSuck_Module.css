@@ -621,6 +621,7 @@
     overflow: hidden;
     padding: 40px 50px 50px 50px;
     position: fixed;
+    width: 344px;
     z-index: 1
 }
 
@@ -848,32 +849,5 @@
 @media (min-width:1183px) {
     .right-sidebar {
         display: inline;
-    }
-
-    .search-button {
-        padding: 10px 10px 10px 35px;
-    }
-
-    .search-input {
-        width: 165px;
-    }
-
-        .right-sidebar {
-        padding: 20px 35px 50px 30px
-    }
-}
-
-@media (min-width:1400px) {
-    .search-button {
-        padding: 10px 10px 10px 5px;
-    }
-
-    .search-input {
-        width: 200px;
-    }
-
-    .right-sidebar {
-        width: 344px;
-        padding: 40px 50px 50px 50px
     }
 }
