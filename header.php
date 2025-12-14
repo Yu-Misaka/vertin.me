@@ -3,6 +3,10 @@
 
 <head>
     <meta charset="<?= $this->options->charset(); ?>">
+
+    <link rel="preconnect" href="https://cdn.academe.city" crossorigin>
+    <link rel="preconnect" href="https://mirrors.sustech.edu.cn" crossorigin>
+
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="renderer" content="webkit">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -16,6 +20,11 @@
         ], '', ' - '); ?>
         <?= $this->options->title(); ?>
     </title>
+
+    <link rel="stylesheet" href="<?= $this->options->themeUrl('css/fontello.css'); ?>">
+    <link rel="stylesheet" href="<?= $this->options->themeUrl('css/PureSuck_Style.css'); ?>">
+    <link rel="stylesheet" href="<?php $this->options->themeUrl('/css/result.css'); ?>">
+
     <?php generateDynamicCSS(); ?>
     <!-- Initial Theme Script -->
     <script>
@@ -138,14 +147,28 @@
             }
         });
     </script>
-    <!-- 导入字体 -->
-    <link rel="preconnect" href="https://cdn.academe.city" />
-    <link defer rel="stylesheet" href="<?php $this->options->themeUrl('/css/result.css'); ?>" type="text/css" media="all" onload="this.media='all'">
+
+    <link rel="stylesheet" href="<?php $this->options->themeUrl('/css/code-reading.css'); ?>" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="<?php $this->options->themeUrl('/css/PureSuck_Module.css'); ?>" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="<?php getStaticURL('aos.css'); ?>" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="<?php $this->options->themeUrl('/css/MoxDesign.css'); ?>" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="<?php $this->options->themeUrl('/css/APlayer.min.css'); ?>" media="all" onload="this.media='all'">
     
+    <link rel="stylesheet" href="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/KaTeX/0.16.9/katex.min.css" media="print" onload="this.media='all'" />
+    <script defer src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+    <script defer src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+    <script defer src="<?php getStaticURL("aos.js") ?>"></script>
+    <script defer src="<?php getStaticURL('medium-zoom.min.js'); ?>"></script>
+    <script src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/aplayer/1.10.1/APlayer.min.js"></script>
+    <script defer src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+    <script defer src="https://cdn.academe.city/vertin.me/lib/lean.min.js"></script>
+    <script defer src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/highlight.js/11.11.1/languages/mathematica.min.js"></script>
+    
+    <script defer src="<?php $this->options->themeUrl('/js/PureSuck_Module.js'); ?>"></script>
+    <script defer src="<?php $this->options->themeUrl('/js/OwO.min.js'); ?>"></script>
+    <script defer src="<?php $this->options->themeUrl('/js/MoxDesign.js'); ?>"></script>
+
     <!-- LATEX -->
-    <script defer type="text/javascript" src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
-    <link defer rel="stylesheet" type="text/css" href="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/KaTeX/0.16.9/katex.min.css" />
-    <script defer type="text/javascript" src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
     <script defer type="text/javascript">
         function renderLatex() {
             renderMathInElement(document.body, {
@@ -168,9 +191,6 @@
         });
     </script>
 
-    <!-- Style CSS -->
-    <link rel="stylesheet" href="<?= $this->options->themeUrl('css/fontello.css'); ?>">
-    <link rel="stylesheet" href="<?= $this->options->themeUrl('css/PureSuck_Style.css'); ?>">
     <!-- 主题样式微调 -->
     <!-- 标题线条 -->
     <?php if ($this->options->postTitleAfter != 'off'): ?>
@@ -191,25 +211,10 @@
             }
         </style>
     <?php endif; ?>
-    <!-- AOS -->
-    <script defer src="<?php getStaticURL("aos.js") ?>"></script>
+
     <!-- ICON Setting -->
     <link rel="icon" href="<?= isset($this->options->logoUrl) && $this->options->logoUrl ? $this->options->logoUrl : $this->options->themeUrl . '/images/avatar.ico'; ?>" type="image/x-icon">
-    <!-- CSS引入 -->
-    <link href="<?php $this->options->themeUrl('/css/code-reading.css'); ?>" rel="stylesheet">
-    <link href="<?php $this->options->themeUrl('/css/PureSuck_Module.css'); ?>" rel="stylesheet">
-    <link href="<?php getStaticURL('aos.css'); ?>" rel="stylesheet">
-    <link defer href="<?php $this->options->themeUrl('/css/MoxDesign.css'); ?>" rel="stylesheet">
-    <link href="<?php $this->options->themeUrl('/css/APlayer.min.css'); ?>" rel="stylesheet">
-    <!-- JS引入 -->
-    <script defer src="<?php getStaticURL('medium-zoom.min.js'); ?>"></script>
-    <script src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/aplayer/1.10.1/APlayer.min.js"></script>
-    <script defer type="text/javascript" src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
-    <script defer type="text/javascript" charset="UTF-8" src="https://cdn.academe.city/vertin.me/lib/lean.min.js"></script>
-    <script defer type="text/javascript" charset="UTF-8" src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/highlight.js/11.11.1/languages/mathematica.min.js"></script>
-    <script defer src="<?php $this->options->themeUrl('/js/PureSuck_Module.js'); ?>"></script>
-    <script defer src="<?php $this->options->themeUrl('/js/OwO.min.js'); ?>"></script>
-    <script defer src="<?php $this->options->themeUrl('/js/MoxDesign.js'); ?>"></script>
+
     <!-- Pjax -->
     <?php if ($this->options->enablepjax == '1'): ?>
         <script defer src="<?php getStaticURL('pjax.min.js'); ?>"></script>
