@@ -433,7 +433,7 @@ small {
 
 }
 
-@media (min-width:1503px) {
+@media (min-width:1400px) {
 
 	.root,
 	html {
@@ -811,7 +811,7 @@ body>.wrapper {
 	}
 }
 
-@media (min-width: 1503px) {
+@media (min-width: 1400px) {
 	body>.wrapper {
 		padding-left: 35px;
 		padding-right: 365px;
@@ -920,7 +920,7 @@ body>.wrapper {
 
 }
 
-@media (min-width:1503px) {
+@media (min-width:1400px) {
 	.header {
 		position: fixed;
 		width: 344px;
@@ -980,7 +980,7 @@ body>.wrapper {
 	}
 }
 
-@media (min-width:1503px) {
+@media (min-width:1400px) {
 	.main {
 		padding-top: 50px;
 		padding-bottom: 112px;
@@ -1199,7 +1199,7 @@ body>.wrapper {
 	}
 }
 
-@media (min-width:1503px) {
+@media (min-width:1400px) {
 	.post {
 		margin-bottom: 55px
 	}
@@ -2174,6 +2174,11 @@ input:-webkit-autofill:active {
 	border-radius: 25px;
 	background-clip: padding-box;
 	background-color: rgb(62 62 62 / 72%)
+}
+
+/* 自定义选中文本的背景色和文字颜色 */
+::selection {
+    background-color: rgba(211, 107, 140, 0.18);
 }
 
 /* 本来想改下样式，但这2000行css不敢动 */
