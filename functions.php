@@ -342,6 +342,22 @@ function themeConfig($form)
     );
     $form->addInput($showCopyright);
 
+    $ccLicense = new Typecho_Widget_Helper_Form_Element_Radio(
+        'ccLicense',
+        array(
+            'by-nc-sa' => _t('CC BY-NC-SA 4.0'),
+            'by-nc' => _t('CC BY-NC 4.0'),
+            'by' => _t('CC BY 4.0'),
+            'by-sa' => _t('CC BY-SA 4.0'),
+            'by-nc-nd' => _t('CC BY-NC-ND 4.0'),
+            'zero' => _t('CC0 1.0'),
+        ),
+        'by-nc-sa',
+        _t('使用的CC协议'),
+        _t('选择使用的CC协议，默认为CC BY-NC-SA 4.0')
+    );
+    $form->addInput($ccLicense);
+
     // 代码高亮设置
     $codeBlockSettings = new Typecho_Widget_Helper_Form_Element_Checkbox(
         'codeBlockSettings',
@@ -576,6 +592,11 @@ function add_zoomable_to_images($content)
     return $content;
 }
 
+function get_cc_link() {
+    $options = Typecho_Widget::widget('Widget_Options');
+    return 'https://creativecommons.org/licenses/' . $options->ccLicense . '/4.0/deed.zh-hans';
+}
+
 function parse_Shortcodes($content)
 {
     // 替换短代码结束标签后的 <br> 标签
@@ -726,28 +747,20 @@ function parse_timeline($content)
 
 function parsePicGrid($content)
 {
-    $pattern = '/\[PicGrid\](.*?)\[\/PicGrid\]/s';
-    preg_match_all($pattern, $content, $matches);
-
-    if (!empty($matches[1])) {
-        foreach ($matches[1] as $match) {
-            $cleanMatch = str_replace('<br>', '', $match);
-            $cleanMatch = preg_replace('/<figcaption>.*?<\/figcaption>/', '', $cleanMatch);
-            $cleanMatch = preg_replace('/<\/?p>/', '', $cleanMatch);
-
-            // 为每个 <figure> 标签添加属性
-            $cleanMatch = preg_replace_callback('/<figure([^>]*)>/i', function ($matches) {
-                $attributes = $matches[1];
-                $new_attributes = ' data-aos="fade-up" data-aos-anchor-placement="top-bottom" data-aos-delay="85"';
-                return "<figure$attributes$new_attributes>";
-            }, $cleanMatch);
-
-            $gridContent = '<div class="pic-grid">' . $cleanMatch . '</div>';
-            $content = str_replace('[PicGrid]' . $match . '[/PicGrid]', $gridContent, $content);
-        }
-    }
-
-    return $content;
+    return preg_replace_callback(
+        '/\[PicGrid\](.*?)\[\/PicGrid\]/s',
+        function ($matches) {
+            // 一次性清理所有不需要的标签
+            $cleanMatch = preg_replace([
+                '/<br\s*\/?>/i',           // 移除 <br> 或 <br />
+                '/<figcaption>.*?<\/figcaption>/s', // 移除 figcaption 及其内容
+                '/<\/?p>/i',               // 移除 <p> 和 </p>
+            ], '', $matches[1]);
+            
+            return '<div class="pic-grid">' . $cleanMatch . '</div>';
+        },
+        $content
+    );
 }
 
 function theme_wrap_tables($content) {
@@ -770,18 +783,6 @@ function parseShortcodes($content)
 
     $content = theme_wrap_tables($content); # 表格外嵌套，用于适配滚动
     $content = add_zoomable_to_images($content); # 图片放大
-
-    // 为所有HTML标签添加 data-aos（极简正则版）
-    $content = preg_replace_callback(
-        '/<(\w+)(\s|>)/i',
-        function ($matches) {
-
-            return '<' . $matches[1] . ' animation: fadeInUp 0.5s ease forwards; ' . $matches[2];
-
-            return $matches[0];
-        },
-        $content
-    );
 
     return $content;
 }
