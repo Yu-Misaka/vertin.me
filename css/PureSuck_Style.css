@@ -2178,7 +2178,7 @@ input:-webkit-autofill:active {
 
 /* 自定义选中文本的背景色和文字颜色 */
 ::selection {
-    background-color: rgba(211, 107, 140, 0.18);
+    background-color: color-mix(in srgb, var(--themecolor) 18%, transparent);
 }
 
 /* 本来想改下样式，但这2000行css不敢动 */

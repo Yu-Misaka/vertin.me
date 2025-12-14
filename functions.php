@@ -431,7 +431,6 @@ function getStaticURL($path)
         "sustech" => [
             'aos.js'            => "https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/aos/2.3.4/aos.js",
             'aos.css'           => "https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/aos/2.3.4/aos.css",
-            'a11y-dark.min.css' => "https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/highlight.js/11.10.0/styles/a11y-dark.min.css",
             'medium-zoom.min.js' => "https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/medium-zoom/1.1.0/medium-zoom.min.js",
             'highlight.min.js'  => "https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/highlight.js/11.10.0/highlight.min.js",
             'pjax.min.js'       => "https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/pjax/0.2.8/pjax.min.js",

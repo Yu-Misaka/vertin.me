@@ -492,8 +492,9 @@
     border-radius: 50%;
     object-fit: cover;
 
-    background-color: var(--pure-color);
-    border: 1px solid var(--line-color);
+    /* 不是有问题，是我友链有些图片不是圆形的hhhh */
+    /*background-color: var(--pure-color);*/
+    /*border: 1px solid var(--line-color);*/
 
     transition: all .3 ease;
 }

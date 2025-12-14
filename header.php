@@ -340,7 +340,7 @@
                         const ap = new APlayer({
                         //定义容器
                         container: document.getElementById('aplayer'),
-                        theme: '#bf763f',
+                        theme: '#ab8748',
                         listFolded: true,
                         listMaxHeight: 90,
                         //关于音频的相关参数：
