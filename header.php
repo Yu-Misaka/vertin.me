@@ -196,7 +196,7 @@
     <!-- ICON Setting -->
     <link rel="icon" href="<?= isset($this->options->logoUrl) && $this->options->logoUrl ? $this->options->logoUrl : $this->options->themeUrl . '/images/avatar.ico'; ?>" type="image/x-icon">
     <!-- CSS引入 -->
-    <link rel="stylesheet" href="https://cdn.academe.city/vertin.me/lib/a11y-dark.min.css">
+    <link href="<?php $this->options->themeUrl('/css/code-reading.css'); ?>" rel="stylesheet">
     <link href="<?php $this->options->themeUrl('/css/PureSuck_Module.css'); ?>" rel="stylesheet">
     <link href="<?php getStaticURL('aos.css'); ?>" rel="stylesheet">
     <link defer href="<?php $this->options->themeUrl('/css/MoxDesign.css'); ?>" rel="stylesheet">
