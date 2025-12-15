@@ -88,8 +88,40 @@
                         </div>
                         <button type="submit" class="submit" id="submit">提交评论</button>
                     </div>
+
+                    <?php if (class_exists('Cap_Plugin')): ?>
+                        <div class="custom-cap-container">
+                            <div class="cap-scale">
+                                <?php Cap_Plugin::output(); ?>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
                 </div>
             </form>
+        
+            <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var submitBtn = document.getElementById('submit');
+                var commentForm = document.getElementById('cf');
+
+                if (submitBtn && commentForm) {
+                    submitBtn.addEventListener('click', function(e) {
+                        var tokenInput = commentForm.querySelector('input[name="cap-token"]');
+                        
+                        if (!tokenInput || !tokenInput.value) {
+                            e.preventDefault();
+                            e.stopPropagation(); 
+                            e.stopImmediatePropagation();
+                            
+                            alert('请先完成人机验证！');
+                            return false;
+                        }
+                    }, true); 
+                }
+            });
+            </script>
+
         </div>
     </div>
 

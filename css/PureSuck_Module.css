@@ -1318,3 +1318,15 @@ html[data-theme="dark"] .tab-header.dir-left .tab-indicator {
         display: none;
     }
 }
+
+.custom-cap-container {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 10px;
+}
+
+.cap-scale {
+    transform: scale(0.8);
+    transform-origin: left top;
+    width: fit-content;
+}
