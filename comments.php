@@ -1,4 +1,3 @@
-<?php if (!defined('__TYPECHO_ROOT_DIR__')) exit; ?>
 <?php if ($this->allow('comment')): ?>
     <?php $this->header('commentReply=1&description=0&keywords=0&generator=0&template=0&pingback=0&xmlrpc=0&wlw=0&rss2=0&rss1=0&antiSpam=0&atom'); ?>
 
@@ -8,12 +7,21 @@
         $cl = $comments->levels > 0 ? 'c_c' : 'c_p';
         $isAdmin = $comments->authorId == 1;
         $author = $comments->url ? '<a href="' . $comments->url . '" target="_blank" rel="external nofollow">' . $comments->author . '</a>' : $comments->author;
-    ?>
+        ?>
         <li id="li-<?php $comments->theId(); ?>" class="<?= $cl; ?>">
             <div id="<?php $comments->theId(); ?>">
                 <?php $avatarUrl = 'https://weavatar.com/avatar/'.md5(strtolower($comments->mail)).'?s=220&d=mm'; ?>
                 <img class="avatarcc" src="<?= $avatarUrl; ?>" loading="lazy" alt="评论头像" />
                 <div class="cp">
+                    <?php
+                    $status = isset($comments->status) ? $comments->status : null;
+                    // status 拿不到时，就尽量保守：不显示提示（避免误伤正常评论）
+                    // 如果能拿到 status，并且不是 approved，就提示待审核/被屏蔽
+                    if ($status && $status !== 'approved'):
+                        ?>
+                        <div class="cp-waiting">这条评论正在等待审核，审核通过后将对所有人可见。</div>
+                    <?php endif; ?>
+
                     <?= parseOwOcodes($comments->content); ?>
                     <div class="cm">
                         <span class="ca"><?= $author; ?></span>
@@ -51,7 +59,7 @@
                 <?php $comments->cancelReply(); ?>
             </div>
             <div class="response comment-title icon-chat">发表新评论</div>
-            <form method="post" action="<?php $this->commentUrl() ?>" id="cf">
+            <form method="post" action="<?php $this->commentUrl() ?>" id="cf" no-pjax>
                 <?php if ($this->user->hasLogin()): ?>
                     <span>亲爱的<a href="<?php $this->options->profileUrl(); ?>">
                             <?php $this->user->screenName(); ?>
@@ -59,26 +67,28 @@
                     </span>
                 <?php else: ?>
                     <?php if ($this->remember('author', true) != "" && $this->remember('mail', true) != ""): ?>
-                        <span>欢迎
-                            <?php $this->remember('author'); ?> 回来~
-                        </span>
+                        <span>欢迎回来，<?php $this->remember('author'); ?></span>
                     <?php endif; ?>
                     <div class="ainfo">
                         <div class="tbox-container">
                             <div class="tbox">
-                                <input type="text" name="author" id="author" class="ci" placeholder="您的昵称" value="<?php $this->remember('author'); ?>" required="">
+                                <input type="text" name="author" id="author" class="ci" placeholder="您的昵称"
+                                    value="<?php $this->remember('author'); ?>" required="">
                             </div>
                             <div class="tbox">
-                                <input type="email" name="mail" id="mail" class="ci" placeholder="邮箱地址" value="<?php $this->remember('mail'); ?>" required="">
+                                <input type="email" name="mail" id="mail" class="ci" placeholder="邮箱地址"
+                                    value="<?php $this->remember('mail'); ?>" required="">
                             </div>
                             <div class="tbox">
-                                <input type="url" name="url" id="url" class="ci" placeholder="您的网站（选填）" value="<?php $this->remember('url'); ?>">
+                                <input type="url" name="url" id="url" class="ci" placeholder="您的网站（选填）"
+                                    value="<?php $this->remember('url'); ?>">
                             </div>
                         </div>
                     </div>
                 <?php endif; ?>
                 <div class="tbox">
-                    <textarea name="text" id="textarea" class="ci OwO-textarea" placeholder="请在这里输入您的评论内容" required><?php $this->remember('text'); ?></textarea>
+                    <textarea name="text" id="textarea" class="ci OwO-textarea" placeholder="请在这里输入您的评论内容"
+                        required><?php $this->remember('text'); ?></textarea>
                     <div class="CtBoxBar">
                         <div class="left-bar">
                             <div class="OwO-bar">

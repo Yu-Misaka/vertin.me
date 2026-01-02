@@ -1,4 +1,5 @@
-<?php if (!defined('__TYPECHO_ROOT_DIR__')) exit; ?>
+<?php if (!defined('__TYPECHO_ROOT_DIR__'))
+    exit; ?>
 <?php $this->need('header.php'); ?>
 
 <div class="wrapper">
@@ -20,7 +21,8 @@
             <!-- 大图样式 -->
             <?php if ($hasImg): ?>
                 <figure class="post-media <?= $this->is('post') ? 'single' : ''; ?>">
-                    <img data-aos="zoom-out" data-aos-anchor-placement="top-bottom" itemprop="image" src="<?php $this->fields->img(); ?>" alt="头图" width="2000" height="800">
+                    <img data-aos="zoom-out" data-aos-anchor-placement="top-bottom" itemprop="image"
+                        src="<?php $this->fields->img(); ?>" alt="头图" width="2000" height="800">
                 </figure>
             <?php endif; ?>
 
@@ -45,23 +47,52 @@
                                 <?php $this->commentsNum('暂无评论', '1 条评论', '%d 条评论'); ?>
                             </a>
                         </div>
+
                         <?php if (!$this->hidden && $this->options->showWordCount == '1'): ?>
+                            <?php
+                            $wordCount = getMarkdownCharacters($this->text);
+                            $readingTime = ceil($wordCount / 250); //假设每分钟250字
+                            ?>
                             <div class="meta post-meta">
                                 <div class="icon-record-outline">
-                                    <?php
-                                    $wordCount = getMarkdownCharacters($this->text); // 计算字数
-                                    echo '全文共&nbsp;' . $wordCount . '&nbsp;字，';
-                                    // 计算阅读时间
-                                    $wordsPerMinute = 250; // 假设阅读速度为每分钟250字
-                                    $readingTime = ceil($wordCount / $wordsPerMinute); // 向上取整
-                                    echo '阅读约&nbsp;' . $readingTime . '&nbsp;分钟';
-                                    ?>
+                                    全文共&nbsp;<?= $wordCount ?>&nbsp;字，
+                                    阅读约&nbsp;<?= $readingTime ?>&nbsp;分钟
                                 </div>
                             </div>
                         <?php endif; ?>
 
-                        <!-- 解析正文以及短代码 -->
-                        <?= parseShortcodes($this->content); ?>
+                        <!-- 解析正文以及短代码，顺便做了加密文章的处理 -->
+                        <?php if ($this->hidden): ?>
+                            <section class="protected-block v3">
+                                <header class="protected-head">
+                                    <span class="protected-dot"></span>
+                                    <div class="protected-texts">
+                                        <div class="protected-title">抱歉，这段内容被锁住了</div>
+                                        <div class="protected-sub">输入密码后将继续显示正文</div>
+                                    </div>
+                                </header>
+                                <div class="protected-divider"></div>
+                                <form method="post"
+                                    action="<?php echo Typecho_Widget::widget('Widget_Security')->getTokenUrl($this->permalink); ?>"
+                                    class="protected-form" no-pjax>
+
+                                    <div class="search-container protected-search">
+                                        <input type="password" name="protectPassword" class="protected-input"
+                                            placeholder="输入密码" required>
+
+                                        <input type="hidden" name="protectCID" value="<?php $this->cid(); ?>">
+
+                                        <button type="submit" class="protected-btn">解锁</button>
+                                    </div>
+                                </form>
+
+                                <div class="protected-ghost" aria-hidden="true">
+                                    <span></span><span></span><span></span><span></span>
+                                </div>
+                            </section>
+                        <?php else: ?>
+                            <?= parseShortcodes($this->content); ?>
+                        <?php endif; ?>
 
                         <!-- 判断并显示版权信息 -->
                         <?php if (!$this->hidden && $this->options->showCopyright == '1'): ?>
@@ -79,7 +110,8 @@
                                     </div>
                                     <div>
                                         <span>许可协议</span>
-                                        <a href="<?php echo get_cc_link(); ?>">CC <?php echo strtoupper($this->options->ccLicense); ?> 4.0</a>
+                                        <a href="<?php echo get_cc_link(); ?>">CC
+                                            <?php echo strtoupper($this->options->ccLicense); ?> 4.0</a>
                                     </div>
                                 </div>
                                 <span class="cc-icon"></span>
@@ -91,7 +123,11 @@
 
             <section class="post-item post-comments">
                 <div class="wrapper post-wrapper">
-                    <?php $this->need('comments.php'); ?>
+                    <?php if ($this->hidden): ?>
+                        <h3><?php _e('评论区已隐藏'); ?></h3>
+                    <?php else: ?>
+                        <?php $this->need('comments.php'); ?>
+                    <?php endif ?>
                 </div>
             </section>
         </div>

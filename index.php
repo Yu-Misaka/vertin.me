@@ -6,10 +6,11 @@
  * 
  * @package PureSuck
  * @author MoXiify
- * @version 1.2.6
+ * @version 1.3.0
  * @link https://www.moxiify.cn
  */
-if (!defined('__TYPECHO_ROOT_DIR__')) exit;
+if (!defined('__TYPECHO_ROOT_DIR__'))
+    exit;
 $this->need('header.php');
 ?>
 
@@ -21,6 +22,26 @@ $this->need('header.php');
         ?>
         <article class="post <?= $hasImg ? 'post--photo post--cover' : 'post--text'; ?> post--index main-item">
             <div class="post-inner" data-aos="fade-up" data-aos-anchor-placement="top-bottom">
+                <?php
+                $showCardCategory = isset($this->options->showCardCategory)
+                    && $this->options->showCardCategory === '1';
+
+                // 仅在开启时才取分类
+                if ($showCardCategory) {
+                    $categories = $this->categories;
+                    if (!empty($categories)) {
+                        $cat = $categories[0];
+                    }
+                }
+                ?>
+
+                <?php if ($showCardCategory && !empty($cat)): ?>
+                    <span class="post-cat-vertical">
+                        <?= htmlspecialchars($cat['name']); ?>
+                    </span>
+                <?php endif; ?>
+
+
                 <header class="post-item post-header  <?= $hasImg ? 'no-bg' : ''; ?>">
                     <div class="wrapper post-wrapper">
                         <div class="avatar post-author">
@@ -33,7 +54,8 @@ $this->need('header.php');
                 <!-- 大图样式 -->
                 <?php if ($hasImg): ?>
                     <figure class="post-media <?= $this->is('post') ? 'single' : ''; ?>">
-                        <img data-aos="zoom-out" data-aos-anchor-placement="top-bottom" itemprop="image" src="<?php $this->fields->img(); ?>" alt="头图" width="2000" height="800">
+                        <img data-aos="zoom-out" data-aos-anchor-placement="top-bottom" itemprop="image"
+                            src="<?php $this->fields->img(); ?>" alt="头图" width="2000" height="800">
                     </figure>
                 <?php endif; ?>
 
@@ -41,31 +63,43 @@ $this->need('header.php');
                 <section class="post-item post-body">
                     <div class="wrapper post-wrapper">
                         <h1 class="post-title">
-                            <a href="<?php $this->permalink() ?>" title="<?php $this->title() ?>">
+                            <a href="<?php $this->permalink() ?>">
                                 <?php $this->title() ?>
                             </a>
                         </h1>
 
                         <!-- 摘要 -->
-                        <p class="post-excerpt">
-                            <?php if ($this->fields->desc): ?>
-                                <?= $this->fields->desc; ?>
-                            <?php else: ?>
-                                <?php $this->excerpt(200, ''); ?>
-                            <?php endif; ?>
-                        </p>
+                        <?php if (
+                            isset($this->password)
+                            && $this->password !== Typecho_Cookie::get('protectPassword')
+                            && $this->authorId !== $this->user->uid
+                            && !$this->user->pass('editor', true)
+                        ): ?>
+                            <p class="post-excerpt">该文章已加密，请输入密码后查看。</p>
+                        <?php else: ?>
+                            <p class="post-excerpt">
+                                <?php if ($this->fields->desc): ?>
+                                    <?= $this->fields->desc; ?>
+                                <?php else: ?>
+                                    <?php $this->excerpt(200, ''); ?>
+                                <?php endif; ?>
+                            </p>
+                        <?php endif; ?>
+
                     </div>
                 </section>
 
                 <footer class="post-item post-footer">
                     <div class="wrapper post-wrapper">
                         <div class="meta post-meta">
-                            <a itemprop="datePublished" href="<?php $this->permalink() ?>" class="icon-ui icon-ui-date meta-item meta-date">
+                            <a itemprop="datePublished" href="<?php $this->permalink() ?>"
+                                class="icon-ui icon-ui-date meta-item meta-date">
                                 <span class="meta-count">
                                     <?php $this->date(); ?>
                                 </span>
                             </a>
-                            <a href="<?php $this->permalink() ?>#comments" class="icon-ui icon-ui-comment meta-item meta-comment">
+                            <a href="<?php $this->permalink() ?>#comments"
+                                class="icon-ui icon-ui-comment meta-item meta-comment">
                                 <?php $this->commentsNum('暂无评论', '1 条评论', '%d 条评论'); ?>
                             </a>
                         </div>
@@ -78,7 +112,8 @@ $this->need('header.php');
 
 <nav class="nav main-pager" data-js="pager">
     <span class="nav-item-alt">
-        第 <?= $this->_currentPage > 1 ? $this->_currentPage : 1; ?> 页 / 共 <?= ceil($this->getTotal() / $this->parameter->pageSize); ?> 页
+        第 <?= $this->_currentPage > 1 ? $this->_currentPage : 1; ?> 页 / 共
+        <?= ceil($this->getTotal() / $this->parameter->pageSize); ?> 页
     </span>
     <div class="nav nav--pager">
         <?php $this->pageLink('上一页'); ?>
@@ -88,12 +123,12 @@ $this->need('header.php');
 </nav>
 
 <div class="nav main-lastinfo">
-        <span class="nav-item-alt">
-            <?php
-            $options = Typecho_Widget::widget('Widget_Options');
-            echo $options->footerInfo;
-            ?>
-        </span>
+    <span class="nav-item-alt">
+        <?php
+        $options = Typecho_Widget::widget('Widget_Options');
+        echo $options->footerInfo;
+        ?>
+    </span>
 </div>
 </main>
 <?php $this->need('sidebar.php'); ?>

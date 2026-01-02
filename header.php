@@ -28,7 +28,7 @@
     <?php generateDynamicCSS(); ?>
     <!-- Initial Theme Script -->
     <script>
-        (function() {
+        (function () {
             const savedTheme = localStorage.getItem('theme');
             const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
             const initialTheme = savedTheme === 'auto' || !savedTheme ? systemTheme : savedTheme;
@@ -37,7 +37,7 @@
     </script>
 
     <script>
-        (function() {
+        (function () {
             // 读取 Cookie 中的 theme
             const matches = document.cookie.match(/(?:^|;)\s*theme=([^;]+)/);
             let mode = matches ? matches[1] : "auto";
@@ -132,14 +132,14 @@
         }
 
         /* 初始化：优先读取 Cookie → 保证跨站同步 */
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             const cookieTheme = getCookie("theme");
             const savedTheme = cookieTheme || localStorage.getItem("theme") || "auto";
             setTheme(savedTheme);
         });
 
         /* 系统主题变化时（仅 auto 模式生效） */
-        window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function(e) {
+        window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function (e) {
             if (localStorage.getItem("theme") === "auto") {
                 const newTheme = e.matches ? "dark" : "light";
                 document.documentElement.setAttribute("data-theme", newTheme);
@@ -147,26 +147,20 @@
             }
         });
     </script>
+    
+    <script>
+        window.THEME_URL = "<?php $this->options->themeUrl(); ?>";
+    </script>
 
-    <link rel="stylesheet" href="<?php $this->options->themeUrl('/css/code-reading.css'); ?>" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="<?php $this->options->themeUrl('/css/PureSuck_Module.css'); ?>" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="<?php getStaticURL('aos.css'); ?>" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="<?php $this->options->themeUrl('/css/MoxDesign.css'); ?>" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="<?php $this->options->themeUrl('/css/APlayer.min.css'); ?>" media="all" onload="this.media='all'">
     
     <link rel="stylesheet" href="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/KaTeX/0.16.9/katex.min.css" media="print" onload="this.media='all'" />
     <script defer src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
     <script defer src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
     <script defer src="<?php getStaticURL("aos.js") ?>"></script>
-    <script defer src="<?php getStaticURL('medium-zoom.min.js'); ?>"></script>
     <script src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/aplayer/1.10.1/APlayer.min.js"></script>
-    <script defer src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
     <script defer src="https://cdn.academe.city/vertin.me/lib/lean.min.js"></script>
     <script defer src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/highlight.js/11.11.1/languages/mathematica.min.js"></script>
-    
-    <script defer src="<?php $this->options->themeUrl('/js/PureSuck_Module.js'); ?>"></script>
-    <script defer src="<?php $this->options->themeUrl('/js/OwO.min.js'); ?>"></script>
-    <script defer src="<?php $this->options->themeUrl('/js/MoxDesign.js'); ?>"></script>
 
     <!-- LATEX -->
     <script defer type="text/javascript">
@@ -193,39 +187,67 @@
 
     <!-- 主题样式微调 -->
     <!-- 标题线条 -->
-    <?php if ($this->options->postTitleAfter != 'off'): ?>
+    <?php if ($this->options->postTitleAfter == 'off'): ?>
         <style>
             .post-title::after {
-                bottom: <?= $this->options->postTitleAfter == 'wavyLine' ? '-5px' : '5px'; ?>;
-                left: <?= '0'; ?>;
-                <?php if ($this->options->postTitleAfter == 'boldLine'): ?>width: <?= '58px'; ?>;
-                height: <?= '13px'; ?>;
-                <?php elseif ($this->options->postTitleAfter == 'wavyLine'): ?>width: <?= '80px'; ?>;
-                height: <?= '12px'; ?>;
-                mask: <?= "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"40\" height=\"10\" viewBox=\"0 0 40 10\" preserveAspectRatio=\"none\"><path d=\"M0 5 Q 10 0, 20 5 T 40 5\" stroke=\"black\" stroke-width=\"2\" fill=\"transparent\"/></svg>') repeat-x"; ?>;
-                mask-size: <?= '40px 12px'; ?>;
+                content: none !important;
+                display: none !important;
+            }
+
+            .post-title {
+                margin: 0;
+            }
+        </style>
+    <?php else: ?>
+        <style>
+            .post-title::after {
+                bottom:
+                    <?= $this->options->postTitleAfter == 'wavyLine' ? '-5px' : '5px'; ?>
+                ;
+                left: 0;
+                <?php if ($this->options->postTitleAfter == 'boldLine'): ?>
+                    width: 58px;
+                    height: 13px;
+                <?php elseif ($this->options->postTitleAfter == 'wavyLine'): ?>
+                    width: 80px;
+                    height: 12px;
+                    mask:
+                        <?= "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"40\" height=\"10\" viewBox=\"0 0 40 10\" preserveAspectRatio=\"none\"><path d=\"M0 5 Q 10 0, 20 5 T 40 5\" stroke=\"black\" stroke-width=\"2\" fill=\"transparent\"/></svg>') repeat-x"; ?>
+                    ;
+                    mask-size: 40px 12px;
                 <?php elseif ($this->options->postTitleAfter == 'handDrawn'): ?>
-                /* 添加手绘风格的样式 */
-                /* 这里可以添加具体的手绘风格的样式，不过浪费了两个小时也没写好，放弃了 */
+                    /* handDrawn... */
                 <?php endif; ?>
             }
         </style>
     <?php endif; ?>
 
     <!-- ICON Setting -->
-    <link rel="icon" href="<?= isset($this->options->logoUrl) && $this->options->logoUrl ? $this->options->logoUrl : $this->options->themeUrl . '/images/avatar.ico'; ?>" type="image/x-icon">
-
+    <link rel="icon"
+        href="<?= isset($this->options->logoUrl) && $this->options->logoUrl ? $this->options->logoUrl : $this->options->themeUrl . '/images/avatar.ico'; ?>"
+        type="image/x-icon">
+    <!-- CSS引入 -->
+    <link href="<?php $this->options->themeUrl('/css/code-reading.css'); ?>" rel="stylesheet">
+    <link href="<?php $this->options->themeUrl('/css/PureSuck_Module.css'); ?>" rel="stylesheet">
+    <link href="<?php getStaticURL(path: 'aos.css'); ?>" rel="stylesheet">
+    <link defer href="<?php $this->options->themeUrl('/css/MoxDesign.css'); ?>" rel="stylesheet">
+    <!-- JS引入 -->
+    <script defer src="<?php getStaticURL(path: 'medium-zoom.min.js'); ?>"></script>
+    <script defer src="<?php getStaticURL(path: 'highlight.min.js'); ?>"></script>
+    <script defer src="<?php $this->options->themeUrl('/js/PureSuck_Module.js'); ?>"></script>
+    <script defer src="<?php $this->options->themeUrl('/js/OwO.min.js'); ?>"></script>
+    <script defer src="<?php $this->options->themeUrl('/js/MoxDesign.js'); ?>"></script>
     <!-- Pjax -->
     <?php if ($this->options->enablepjax == '1'): ?>
         <script defer src="<?php getStaticURL('pjax.min.js'); ?>"></script>
         <script type="text/javascript">
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function () {
                 var pjax = new Pjax({
                     history: true,
                     scrollRestoration: true,
                     cacheBust: false,
                     timeout: 6500,
-                    elements: 'a[href^="<?php Helper::options()->siteUrl() ?>"]:not(a[target="_blank"], a[no-pjax] ), form[action]',
+                    elements: 'a[href^="<?php Helper::options()->siteUrl() ?>"]:not(a[target="_blank"], a[no-pjax]), form[action]:not([no-pjax])',
                     selectors: [
                         "pjax",
                         "script[data-pjax]",
@@ -238,14 +260,14 @@
             });
 
             // Pjax 加载超时时跳转，不然它不给你跳转的！！！
-            document.addEventListener('pjax:error', function(e) {
+            document.addEventListener('pjax:error', function (e) {
                 console.error(e);
                 console.log('pjax error: \n' + JSON.stringify(e));
                 window.location.href = e.triggerElement.href;
             });
 
             // Pjax 完成后 JS 重载
-            document.addEventListener("pjax:success", function(event) {
+            document.addEventListener("pjax:success", function (event) {
 
                 // 短代码及模块部分
                 runShortcodes();
@@ -296,14 +318,11 @@
     <div class="wrapper">
         <header class="header" data-js="header">
             <div class="wrapper header-wrapper header-title">
-                <a href="<?= $this->options->logoIndexUrl ?: $this->options->siteUrl; ?>" class="avatar-link" aria-label="博主名字">
+                <a href="<?= $this->options->logoIndexUrl ?: $this->options->siteUrl; ?>" class="avatar-link"
+                    aria-label="博主名字">
                     <span class="el-avatar el-avatar--circle avatar-hover-effect">
-                        <img src="<?= $this->options->logoIndex; ?>"
-                            style="object-fit:cover;"
-                            alt="博主头像"
-                            width="120"
-                            height="120"
-                            data-name="博主名字" draggable="false">
+                        <img src="<?= $this->options->logoIndex; ?>" style="object-fit:cover;" alt="博主头像" width="120"
+                            height="120" data-name="博主名字" draggable="false">
                     </span>
                 </a>
                 <div class="header-title">
