@@ -147,44 +147,11 @@
             }
         });
     </script>
-    
+
     <script>
         window.THEME_URL = "<?php $this->options->themeUrl(); ?>";
     </script>
-
-    <link rel="stylesheet" href="<?php $this->options->themeUrl('/css/APlayer.min.css'); ?>" media="all" onload="this.media='all'">
     
-    <link rel="stylesheet" href="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/KaTeX/0.16.9/katex.min.css" media="print" onload="this.media='all'" />
-    <script defer src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
-    <script defer src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
-    <script defer src="<?php getStaticURL("aos.js") ?>"></script>
-    <script src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/aplayer/1.10.1/APlayer.min.js"></script>
-    <script defer src="https://cdn.academe.city/vertin.me/lib/lean.min.js"></script>
-    <script defer src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/highlight.js/11.11.1/languages/mathematica.min.js"></script>
-
-    <!-- LATEX -->
-    <script defer type="text/javascript">
-        function renderLatex() {
-            renderMathInElement(document.body, {
-                delimiters: [{
-                    left: "$$",
-                    right: "$$",
-                    display: true
-                }, {
-                    left: "$",
-                    right: "$",
-                    display: false
-                }],
-                ignoredTags: ["script", "noscript", "style", "textarea", "pre", "code"],
-                ignoredClasses: ["nokatex"]
-            });
-        }
-    
-        document.addEventListener("DOMContentLoaded", function() {
-            renderLatex();
-        });
-    </script>
-
     <!-- 主题样式微调 -->
     <!-- 标题线条 -->
     <?php if ($this->options->postTitleAfter == 'off'): ?>
@@ -221,7 +188,8 @@
             }
         </style>
     <?php endif; ?>
-
+    <!-- AOS -->
+    <script defer src="<?php getStaticURL("aos.js") ?>"></script>
     <!-- ICON Setting -->
     <link rel="icon"
         href="<?= isset($this->options->logoUrl) && $this->options->logoUrl ? $this->options->logoUrl : $this->options->themeUrl . '/images/avatar.ico'; ?>"
@@ -231,12 +199,42 @@
     <link href="<?php $this->options->themeUrl('/css/PureSuck_Module.css'); ?>" rel="stylesheet">
     <link href="<?php getStaticURL(path: 'aos.css'); ?>" rel="stylesheet">
     <link defer href="<?php $this->options->themeUrl('/css/MoxDesign.css'); ?>" rel="stylesheet">
+    <link href="<?php $this->options->themeUrl('/css/APlayer.min.css'); ?>" rel="stylesheet">
+    <link href="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/KaTeX/0.16.9/katex.min.css" rel="stylesheet">
     <!-- JS引入 -->
     <script defer src="<?php getStaticURL(path: 'medium-zoom.min.js'); ?>"></script>
     <script defer src="<?php getStaticURL(path: 'highlight.min.js'); ?>"></script>
     <script defer src="<?php $this->options->themeUrl('/js/PureSuck_Module.js'); ?>"></script>
     <script defer src="<?php $this->options->themeUrl('/js/OwO.min.js'); ?>"></script>
     <script defer src="<?php $this->options->themeUrl('/js/MoxDesign.js'); ?>"></script>
+    <script defer src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+    <script defer src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+    <script src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/aplayer/1.10.1/APlayer.min.js"></script>
+    <script defer src="https://cdn.academe.city/vertin.me/lib/lean.min.js"></script>
+    <script defer src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/highlight.js/11.11.1/languages/mathematica.min.js"></script>
+    <!-- LATEX -->
+    <script defer type="text/javascript">
+        function renderLatex() {
+            renderMathInElement(document.body, {
+                delimiters: [{
+                    left: "$$",
+                    right: "$$",
+                    display: true
+                }, {
+                    left: "$",
+                    right: "$",
+                    display: false
+                }],
+                ignoredTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+                ignoredClasses: ["nokatex"]
+            });
+        }
+    
+        document.addEventListener("DOMContentLoaded", function() {
+            renderLatex();
+        });
+    </script>
+
     <!-- Pjax -->
     <?php if ($this->options->enablepjax == '1'): ?>
         <script defer src="<?php getStaticURL('pjax.min.js'); ?>"></script>
