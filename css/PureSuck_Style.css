@@ -856,7 +856,7 @@ body>.wrapper {
 	body>.wrapper {
 		max-width: 1700px;
 		padding-left: 0px;
-		padding-right: 328px;
+		padding-right: 299px;
 	}
 }
 
@@ -958,10 +958,9 @@ body>.wrapper {
 	.header {
 		position: fixed;
 		width: 328px;
-		padding-top: 50px;
-		padding-right: 40px;
+		padding-top: 25px;
+		padding-right: 56px;
 		padding-bottom: 40px;
-		margin-right: -328px;
 	}
 
 	.header-wrapper {
@@ -1002,6 +1001,7 @@ body>.wrapper {
 	.header {
 		position: fixed;
 		width: 344px;
+		padding-top: 50px;
 		padding-right: 50px;
 		padding-bottom: 50px;
 		margin-right: -344px;
@@ -1049,9 +1049,9 @@ body>.wrapper {
 
 @media (min-width:1183px) {
 	.main {
-		padding-top: 50px;
+		padding-top: 25px;
 		padding-bottom: 112px;
-		padding-left: 325px
+		padding-left: 299px
 	}
 
 	.main-pager {
