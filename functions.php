@@ -25,14 +25,14 @@ function themeInit($archive)
 
     // AJAX 接口：获取 Token URL
     if ($archive->is('post') && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['type']) && $_POST['type'] === 'getTokenUrl') {
-        header('Content-Type: application/json; charset=utf-8');
+        header('Content-Type: application/json; charset=UTF-8');
         echo json_encode(['tokenUrl' => Typecho_Widget::widget('Widget_Security')->getTokenUrl($archive->permalink)]);
         exit;
     }
 
     // AJAX 接口：检查文章是否仍为加密状态
     if ($archive->is('post') && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['type']) && $_POST['type'] === 'checkPassword') {
-        header('Content-Type: application/json; charset=utf-8');
+        header('Content-Type: application/json; charset=UTF-8');
         echo json_encode(['hidden' => $archive->hidden]);
         exit;
     }
@@ -694,13 +694,15 @@ function add_zoomable_to_images($content)
 
         // 如果不在排除列表中，添加 data-zoomable 属性和懒加载
         if (!$should_exclude) {
-            // 添加 data-zoomable 属性
-            if (strpos($img, 'data-zoomable') === false) {
+            // 添加 data-zoomable 和 loading="lazy" 属性（合并到一次操作）
+            $hasZoomable = strpos($img, 'data-zoomable') !== false;
+            $hasLazy = strpos($img, 'loading=') !== false;
+            
+            if (!$hasZoomable && !$hasLazy) {
+                $img = preg_replace('/<img/', '<img data-zoomable loading="lazy"', $img);
+            } elseif (!$hasZoomable) {
                 $img = preg_replace('/<img/', '<img data-zoomable', $img);
-            }
-
-            // 添加 loading="lazy" 属性(如果还没有)
-            if (strpos($img, 'loading=') === false) {
+            } elseif (!$hasLazy) {
                 $img = preg_replace('/<img/', '<img loading="lazy"', $img);
             }
         }
@@ -737,15 +739,15 @@ function parse_Shortcodes($content)
 
     // 处理 [alert] 短代码
     $content = preg_replace_callback('/\[alert type="([^"]*)"\](.*?)\[\/alert\]/s', function ($matches) {
-        $type = $matches[1];
+        $type = htmlspecialchars($matches[1], ENT_QUOTES, 'UTF-8');
         $text = $matches[2];
         return "<div alert-type=\"$type\">$text</div>";
     }, $content);
 
     // 处理 [window] 短代码
     $content = preg_replace_callback('/\[window type="([^"]*)" title="([^"]*)"\](.*?)\[\/window\]/s', function ($matches) {
-        $type = $matches[1];
-        $title = $matches[2];
+        $type = htmlspecialchars($matches[1], ENT_QUOTES, 'UTF-8');
+        $title = htmlspecialchars($matches[2], ENT_QUOTES, 'UTF-8');
         $text = preg_replace('/^<br\s*\/?>/', '', $matches[3]);
         return "<div window-type=\"$type\" title=\"$title\">$text</div>";
     }, $content);
