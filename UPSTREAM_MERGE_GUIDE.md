@@ -148,7 +148,12 @@ git commit -m "Merge upstream/main with custom features preserved"
 
 1. **保留上游的核心功能更新**
 2. **保留自定义的 `getStaticURL()` 函数**（如果有）
-3. **更新版本号为上游版本**
+3. **更新版本号**：版本号位于 `themeConfig()` 函数中，约在第 185 行：
+   ```php
+   echo '
+   <h3>当前主题版本：<span style="color: #b45864;">1.3.0</span></h3>
+   ```
+   将版本号更新为上游的最新版本（如 `1.3.1`）
 4. **保留自定义配置项**
 
 ### footer.php 合并策略
@@ -179,10 +184,14 @@ fonts/*                    # 本地字体（可选）
 # 检查文件是否被删除
 git status
 
-# 如果文件被删除，恢复它们
-git checkout HEAD -- css/APlayer.min.css
-git checkout HEAD -- css/code-reading.css
+# 如果文件被删除，使用原分支名恢复它们
+# 注意：合并过程中，HEAD 可能指向合并状态，使用你的原分支名更安全
+git checkout main -- css/APlayer.min.css
+git checkout main -- css/code-reading.css
 # ... 等等
+
+# 或者使用 git restore（Git 2.23+）
+git restore --source=main --worktree css/APlayer.min.css
 ```
 
 ---
@@ -243,7 +252,10 @@ CUSTOM_FILES=(
 for file in "${CUSTOM_FILES[@]}"; do
     if [ ! -f "$file" ]; then
         echo "恢复自定义文件: $file"
-        git checkout HEAD -- "$file" 2>/dev/null || echo "文件不存在: $file"
+        # 使用 ORIG_HEAD 或原分支名来恢复合并前的文件
+        git checkout ORIG_HEAD -- "$file" 2>/dev/null || \
+        git checkout main -- "$file" 2>/dev/null || \
+        echo "警告：文件不存在: $file"
     fi
 done
 
