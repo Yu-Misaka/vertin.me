@@ -329,43 +329,18 @@ function themeConfig($form)
     );
     $form->addInput($footerInfo);
 
-    // Pjax 开关
-    // https://github.com/MoOx/pjax
+    // Swup 页面过渡动画（强制启用，无需开关）
+    // 主题依赖 Swup 实现页面切换动画和 AJAX 功能
 
-    $enablepjax = new Typecho_Widget_Helper_Form_Element_Radio(
-        'enablepjax',
-        array('1' => _t('启用'), '0' => _t('关闭')),
-        '1',
-        _t('是否启用 Pjax 加载（实验性）'),
-        _t('可以大幅提高页面加载效率和切换体验')
-    );
-    $form->addInput($enablepjax);
-
-    // Pjax回调函数
+    // Swup 回调函数
     $PjaxScript = new \Typecho\Widget\Helper\Form\Element\Textarea(
         'PjaxScript',
         null,
         null,
-        _t('Pjax回调函数'),
-        _t('在这里填入需要被 Pjax 回调的函数，例如：loadDPlayer(); 如果不知道这是什么，请忽略。')
+        _t('Swup 回调函数'),
+        _t('在这里填入需要在每次页面切换后执行的函数，例如：loadDPlayer(); 如果不知道这是什么，请忽略。')
     );
     $form->addInput($PjaxScript);
-
-    // $enablepjax = new Typecho_Widget_Helper_Form_Element_Select('enablepjax', array(
-    //     '1' => '启用',
-    //     '0' => '关闭'
-    // ), '1', _t('是否启用 Pjax 加载'), _t('是否启用 Pjax 加载'));
-    // $layout->addItem($enablepjax);  // 注册
-
-    // echo `如果你启用了 PJax，你可能需要稍微配置一下代码使它正常运行。<br />
-    // 所有被 <pjax></pjax> 标签包裹的所有元素将被pjax重载。<br />
-    // 所有含有 data-pjax 标记的 script 标签将被pjax重载。<br />
-    // <ul >
-    // <li>事件：<code>pjax:send</code>在 Pjax 请求开始后触发。</font></li>
-    // <li>事件：<code>pjax:complete</code>在 Pjax 请求完成后触发。</font></li>
-    // <li>事件：<code>pjax:success</code>在 Pjax 请求成功后触发。</font></li>
-    // <li>事件：<code>pjax:error</code>在 Pjax 请求失败后触发。</li>
-    // </ul>`;
 
     //主题样式细调
     // 标题粗下划线
@@ -455,18 +430,6 @@ function themeConfig($form)
     );
     $form->addInput($ccLicense);
 
-    // 代码高亮设置
-    $codeBlockSettings = new Typecho_Widget_Helper_Form_Element_Checkbox(
-        'codeBlockSettings',
-        array(
-            'ShowLineNumbers' => _t('显示代码行数'),
-            'ShowCopyButton' => _t('显示复制按钮')
-        ),
-        array('ShowLineNumbers', 'ShowCopyButton'), // 默认选中
-        _t('代码高亮个性化')
-    );
-    $form->addInput($codeBlockSettings->multiMode());
-
     // 主题配色
     $colors = array(
         'pink' => _t('素粉'),
@@ -514,40 +477,20 @@ function getStaticURL($path)
     $staticMap = [
         // 本地资源（主题目录）
         'local' => [
-            'aos.js' => $options->themeUrl . '/js/lib/aos.js',
-            'aos.css' => $options->themeUrl . '/css/lib/aos.css',
             'medium-zoom.min.js' => $options->themeUrl . '/js/lib/medium-zoom.min.js',
-            'highlight.min.js' => $options->themeUrl . '/js/lib/highlight.min.js',
-            'pjax.min.js' => $options->themeUrl . '/js/lib/pjax.min.js',
-            'pace.min.js' => $options->themeUrl . '/js/lib/pace.min.js',
-            'pace-theme-default.min.css' => $options->themeUrl . '/css/lib/pace-theme-default.min.css'
+            'Swup.umd.min.js' => $options->themeUrl . '/js/lib/Swup/Swup.umd.min.js',
         ],
         'bootcdn' => [
-            'aos.js' => "https://cdn.bootcdn.net/ajax/libs/aos/2.3.4/aos.js",
-            'aos.css' => "https://cdn.bootcdn.net/ajax/libs/aos/2.3.4/aos.css",
             'medium-zoom.min.js' => "https://cdn.bootcdn.net/ajax/libs/medium-zoom/1.1.0/medium-zoom.min.js",
-            'highlight.min.js' => "https://cdn.bootcdn.net/ajax/libs/highlight.js/11.10.0/highlight.min.js",
-            'pjax.min.js' => "https://cdn.bootcdn.net/ajax/libs/pjax/0.2.8/pjax.min.js",
-            'pace.min.js' => 'https://cdn.bootcdn.net/ajax/libs/pace/1.2.4/pace.min.js',
-            'pace-theme-default.min.css' => "https://cdn.bootcdn.net/ajax/libs/pace/1.2.4/pace-theme-default.min.css"
+            'Swup.umd.min.js' => "https://cdn.bootcdn.net/ajax/libs/swup/4.8.2/Swup.umd.min.js",
         ],
         "cdnjs" => [
-            'aos.js' => "https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js",
-            'aos.css' => "https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css",
             'medium-zoom.min.js' => "https://cdnjs.cloudflare.com/ajax/libs/medium-zoom/1.1.0/medium-zoom.min.js",
-            'highlight.min.js' => "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js",
-            'pjax.min.js' => "https://cdnjs.cloudflare.com/ajax/libs/pjax/0.2.8/pjax.min.js",
-            'pace.min.js' => 'https://cdnjs.cloudflare.com/ajax/libs/pace/1.2.4/pace.min.js',
-            'pace-theme-default.min.css' => "https://cdnjs.cloudflare.com/ajax/libs/pace/1.2.4/pace-theme-default.min.css"
+            'Swup.umd.min.js' => "https://cdnjs.cloudflare.com/ajax/libs/swup/4.8.2/Swup.umd.min.js",
         ],
         "sustech" => [
-            'aos.js'            => "https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/aos/2.3.4/aos.js",
-            'aos.css'           => "https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/aos/2.3.4/aos.css",
             'medium-zoom.min.js' => "https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/medium-zoom/1.1.0/medium-zoom.min.js",
-            'highlight.min.js'  => "https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/highlight.js/11.10.0/highlight.min.js",
-            'pjax.min.js'       => "https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/pjax/0.2.8/pjax.min.js",
-            'pace.min.js'       => "https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/pace/1.2.4/pace.min.js",
-            'pace-theme-default.min.css' => "https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/pace/1.2.4/pace-theme-default.min.css"
+            'Swup.umd.min.js' => "https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/swup/4.8.2/Swup.umd.min.js",
         ]
 
     ];

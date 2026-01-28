@@ -10,7 +10,7 @@
         ?>
         <li id="li-<?php $comments->theId(); ?>" class="<?= $cl; ?>">
             <div id="<?php $comments->theId(); ?>">
-                <?php $avatarUrl = 'https://weavatar.com/avatar/'.md5(strtolower($comments->mail)).'?s=220&d=mm'; ?>
+                <?php $avatarUrl = 'https://cn.cravatar.com/avatar/' . md5(strtolower($comments->mail)) . '?s=128&d=mm'; ?>
                 <img class="avatarcc" src="<?= $avatarUrl; ?>" loading="lazy" alt="评论头像" />
                 <div class="cp">
                     <?php
@@ -30,7 +30,7 @@
                         <?php endif; ?>
                         <?php $comments->date(); ?>
                         <span class="cr">
-                            <?php $comments->reply(); ?>
+                            <?php $comments->reply('回复'); ?>
                         </span>
                     </div>
                 </div>
@@ -45,18 +45,22 @@
 
     <div id="comments" class="cf">
         <?php $this->comments()->to($comments); ?>
-        <?php if ($comments->have()): ?>
-            <div class="comment-title">
-                <?php $this->commentsNum(_t('暂无评论'), _t('仅有 1 条评论'), _t('已有 %d 条评论')); ?>
-            </div>
-            <?php $comments->listComments(); ?>
-            <div class="page-navigator">
-                <?php $comments->pageNav('上一页', '下一页', 10, '...', array('wrapTag' => 'ul', 'wrapClass' => 'pagination', 'itemTag' => 'li', 'currentClass' => 'active')); ?>
-            </div>
-        <?php endif; ?>
+        <!-- ★ 评论列表容器（可单独刷新） -->
+        <div id="comments-list">
+            <?php if ($comments->have()): ?>
+                <h1 class="comment-title">
+                    <?php $this->commentsNum(_t('暂无评论'), _t('仅有 1 条评论'), _t('已有 %d 条评论')); ?>
+                </h1>
+                <?php $comments->listComments(); ?>
+                <div class="page-navigator">
+                    <?php $comments->pageNav('上一页', '下一页', 10, '...', array('wrapTag' => 'ul', 'wrapClass' => 'pagination', 'itemTag' => 'li', 'currentClass' => 'active')); ?>
+                </div>
+            <?php endif; ?>
+        </div>
+        <!-- ★ 评论表单（不刷新，保持OwO实例） -->
         <div id="<?php $this->respondId(); ?>" class="respond">
             <div class="ccr">
-                <?php $comments->cancelReply(); ?>
+                <?php $comments->cancelReply('取消'); ?>
             </div>
             <div class="response comment-title icon-chat">发表新评论</div>
             <form method="post" action="<?php $this->commentUrl() ?>" id="cf" no-pjax>
@@ -88,50 +92,18 @@
                 <?php endif; ?>
                 <div class="tbox">
                     <textarea name="text" id="textarea" class="ci OwO-textarea" placeholder="请在这里输入您的评论内容"
-                        required><?php $this->remember('text'); ?></textarea>
+                        data-owo-id="comment-textarea-<?php $this->cid(); ?>" required><?php $this->remember('text'); ?></textarea>
                     <div class="CtBoxBar">
                         <div class="left-bar">
                             <div class="OwO-bar">
-                                <div class="OwO"></div>
+                                <div class="OwO" data-owo-id="comment-owo-<?php $this->cid(); ?>"></div>
                             </div>
                             <!-- 未来可以在这里添加更多内容 -->
                         </div>
                         <button type="submit" class="submit" id="submit">提交评论</button>
                     </div>
-
-                    <?php if (class_exists('Cap_Plugin')): ?>
-                        <div class="custom-cap-container">
-                            <div class="cap-scale">
-                                <?php Cap_Plugin::output(); ?>
-                            </div>
-                        </div>
-                    <?php endif; ?>
-
                 </div>
             </form>
-        
-            <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                var submitBtn = document.getElementById('submit');
-                var commentForm = document.getElementById('cf');
-
-                if (submitBtn && commentForm) {
-                    submitBtn.addEventListener('click', function(e) {
-                        var tokenInput = commentForm.querySelector('input[name="cap-token"]');
-                        
-                        if (!tokenInput || !tokenInput.value) {
-                            e.preventDefault();
-                            e.stopPropagation(); 
-                            e.stopImmediatePropagation();
-                            
-                            alert('请先完成人机验证！');
-                            return false;
-                        }
-                    }, true); 
-                }
-            });
-            </script>
-
         </div>
     </div>
 

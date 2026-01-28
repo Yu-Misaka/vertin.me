@@ -7,13 +7,18 @@
     <?php
     $hasImg = $this->fields->img ? true : false;
     ?>
-    <article class="post <?= $hasImg ? 'post--photo post--cover' : 'post--text'; ?> post--index main-item">
-        <div class="post-inner" data-aos="fade-up" data-aos-anchor-placement="top-bottom">
+    <article class="post <?= $hasImg ? 'post--photo post--cover' : 'post--text'; ?> post--index post--single main-item" data-ps-post-key="<?= $this->cid; ?>">
+        <div class="post-inner">
             <header class="post-item post-header  <?= $hasImg ? 'no-bg' : ''; ?>">
                 <div class="wrapper post-wrapper">
                     <div class="avatar post-author">
-                        <img src="<?= $this->options->authorAvatar ?: $this->options->themeUrl('images/avatar.png'); ?>" alt="作者头像" class="avatar-item avatar-img">
-                        <span class="avatar-item">Suzuka</span>
+                        <img src="<?= $this->options->authorAvatar ?: $this->options->themeUrl('images/avatar.webp'); ?>"
+                            alt="作者头像"
+                            class="avatar-item avatar-img"
+                            loading="lazy"
+                            decoding="async"
+                            fetchpriority="low">
+                        <span class="avatar-item"><?php $this->author(); ?></span>
                     </div>
                 </div>
             </header>
@@ -21,8 +26,12 @@
             <!-- 大图样式 -->
             <?php if ($hasImg): ?>
                 <figure class="post-media <?= $this->is('post') ? 'single' : ''; ?>">
-                    <img data-aos="zoom-out" data-aos-anchor-placement="top-bottom" itemprop="image"
-                        src="<?php $this->fields->img(); ?>" alt="头图" width="2000" height="800">
+                    <img itemprop="image"
+                        src="<?php $this->fields->img(); ?>"
+                        alt="头图"
+                        loading="lazy"
+                        decoding="async"
+                        fetchpriority="high">
                 </figure>
             <?php endif; ?>
 
@@ -51,7 +60,7 @@
                         <?php if (!$this->hidden && $this->options->showWordCount == '1'): ?>
                             <?php
                             $wordCount = getMarkdownCharacters($this->text);
-                            $readingTime = ceil($wordCount / 250); //假设每分钟250字
+                            $readingTime = ceil($wordCount / 300); //假设每分钟300字
                             ?>
                             <div class="meta post-meta">
                                 <div class="icon-record-outline">
@@ -74,7 +83,7 @@
                                 <div class="protected-divider"></div>
                                 <form method="post"
                                     action="<?php echo Typecho_Widget::widget('Widget_Security')->getTokenUrl($this->permalink); ?>"
-                                    class="protected-form" no-pjax>
+                                    class="protected-form">
 
                                     <div class="search-container protected-search">
                                         <input type="password" name="protectPassword" class="protected-input"
@@ -91,7 +100,9 @@
                                 </div>
                             </section>
                         <?php else: ?>
-                            <?= parseShortcodes($this->content); ?>
+                            <div class="post-content">
+                                <?= renderPostContent($this->content); ?>
+                            </div>
                         <?php endif; ?>
 
                         <!-- 判断并显示版权信息 -->
