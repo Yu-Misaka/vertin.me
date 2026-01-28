@@ -92,7 +92,7 @@
     border-radius: 14px;
     cursor: pointer;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    transition: all .4s cubic-bezier(0.345, 0.045, 0.345, 1);
+    transition: opacity .3s ease, background-color .3s ease;
 }
 
 #go-top.visible {
@@ -133,7 +133,7 @@
     margin: 20px 0 !important;
     display: flex;
     padding: 10px 20px;
-    transition: all .3s ease;
+    transition: transform .3s ease, box-shadow .3s ease;
     transform: scale(1);
     color: var(--pure-color);
     font-weight: bold;
@@ -177,41 +177,6 @@
 }
 
 /* WINDOW 信息窗 */
-.notifications-container {
-    width: auto;
-    height: auto;
-    cursor: pointer;
-    font-size: 0.95rem;
-    border-radius: 0.7rem;
-    line-height: 1.4rem;
-    flex-direction: column;
-    gap: 1rem;
-    margin: 20px 0 !important;
-    transition: all .3s cubic-bezier(0.345, 0.045, 0.345, 1);
-    box-shadow: 1px 1px 3px 0 rgba(0, 0, 0, .05);
-}
-
-
-.notifications-container {
-    transition: box-shadow .25s ease, transform .25s ease;
-}
-
-.notifications-container:hover {
-    transform: translateY(-2px);
-    /* 减半 */
-    box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
-}
-
-/* Tab Header 在 hover 时“醒一下” */
-.notifications-container:hover .window::before {
-    opacity: 0.35;
-}
-
-/* 右侧出现极弱的结构提示 */
-.notifications-container:hover .window::after {
-    opacity: 0.14;
-}
-
 .flex {
     display: flex;
 }
@@ -221,9 +186,39 @@
 }
 
 .window {
+    width: auto;
+    height: auto;
+    cursor: pointer;
+    font-size: 0.95rem;
+    border-radius: 0.7rem;
+    line-height: 1.4rem;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 20px 0 !important;
     padding: 20px 0px 0px 10px;
     position: relative;
-    border-radius: 0.7rem;
+    transition: background-color .3s ease, border-color .3s ease, transform .3s ease;
+}
+
+@media (hover: hover) {
+    .window:hover {
+        background-color: color-mix(in srgb, var(--themecolor) 8%, var(--card-color));
+        border-color: color-mix(in srgb, var(--themehovercolor) 75%, var(--border-color));
+    }
+}
+
+/* Tab Header 在 hover 时"醒一下" */
+@media (hover: hover) {
+    .window:hover::before {
+        opacity: 0.35;
+    }
+}
+
+/* 右侧出现极弱的结构提示 */
+@media (hover: hover) {
+    .window:hover::after {
+        opacity: 0.14;
+    }
 }
 
 .window::before {
@@ -237,6 +232,7 @@
     opacity: 0.22;
     border-radius: 0 0 3px 3px;
     pointer-events: none;
+    transition: opacity .3s ease;
 }
 
 .window::after {
@@ -252,10 +248,7 @@
             transparent);
     opacity: 0.04;
     pointer-events: none;
-}
-
-.notifications-container:active .window::after {
-    opacity: 0.08;
+    transition: opacity .3s ease;
 }
 
 .window.blue {
@@ -315,6 +308,7 @@
 
 .window-prompt-wrap {
     margin: 0 0.75rem;
+    transition: letter-spacing .35s ease, color .5s ease;
 }
 
 .window-prompt-wrap a {
@@ -324,6 +318,18 @@
 .window-prompt-heading {
     font-weight: bold;
     text-align: left;
+    letter-spacing: 0.01em;
+    transition: letter-spacing .35s ease, color .5s ease;
+}
+
+@media (hover: hover) {
+    .window:hover .window-prompt-heading {
+        letter-spacing: 0.03em;
+    }
+
+    .window:hover .window-prompt-wrap {
+        letter-spacing: 0.01em;
+    }
 }
 
 .window-prompt-prompt,
@@ -379,7 +385,7 @@
 
     user-select: none;
 
-    transition: all .3s ease;
+    transition: background-color .3s ease, border-color .3s ease, transform .3s ease, scale .3s ease, opacity .3s ease;
 }
 
 @media (hover: hover) {
@@ -408,7 +414,7 @@
     letter-spacing: 0.01em;
     color: var(--text-color);
 
-    transition: all .3s ease;
+    transition: color .3s ease, letter-spacing .3s ease;
 }
 
 .friends-card-username::before {
@@ -424,7 +430,7 @@
     border: 1.5px solid var(--line-color);
     background-color: transparent;
 
-    transition: all .3 ease;
+    transition: border-color .3s ease, transform .3s ease;
 }
 
 .friends-card-username::after {
@@ -498,7 +504,7 @@
     /*background-color: var(--pure-color);*/
     /*border: 1px solid var(--line-color);*/
 
-    transition: all .3 ease;
+    transition: border-color .3s ease, box-shadow .3s ease;
 }
 
 @media (hover: none) {
@@ -616,7 +622,8 @@
 .collapsible-content {
     max-height: 0;
     overflow: hidden;
-    transition: max-height .45s ease;
+    /* 与整体动画节奏协调：480ms + cubic-bezier 缓动 */
+    transition: max-height .48s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .collapsible-details {
@@ -625,7 +632,8 @@
     line-height: 1.85;
     transform: translateY(-6px);
     opacity: 0;
-    transition: transform .4s ease, opacity .4s ease;
+    /* 内容淡入：略快于容器展开，形成层次感 */
+    transition: transform .42s cubic-bezier(0.2, 0.8, 0.2, 1), opacity .42s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .collapsible-details>*:first-child {
@@ -907,8 +915,9 @@ timeline-description {
     height: 2px;
     border-radius: 2px;
     transition:
-        left .42s cubic-bezier(0.345, 0.045, 0.345, 1),
+        transform .42s cubic-bezier(0.345, 0.045, 0.345, 1),
         width .42s cubic-bezier(0.345, 0.045, 0.345, 1);
+    will-change: transform, width
 }
 
 .tab-header.dir-right .tab-indicator {
@@ -1000,8 +1009,7 @@ html[data-theme="dark"] .tab-header.dir-left .tab-indicator {
     overflow: hidden;
     padding: 40px 50px 50px 50px;
     position: fixed;
-    width: 344px;
-    z-index: 1
+    z-index: 1;
 }
 
 /* 分类和标签模块 */
@@ -1126,7 +1134,6 @@ html[data-theme="dark"] .tab-header.dir-left .tab-indicator {
     overflow: hidden;
     -ms-overflow-style: none;
     scrollbar-width: none;
-
 }
 
 .toc-section.sticky {
@@ -1134,6 +1141,19 @@ html[data-theme="dark"] .tab-header.dir-left .tab-indicator {
     padding: 35px 100px 50px 0px;
     width: 344px;
     top: 0;
+    z-index: 100;
+}
+
+/* ✅ TOC 固定时，隐藏 sidebar 中 TOC 之前的所有元素 */
+.toc-section.sticky~.cloud-section,
+.toc-section.sticky~.search-section {
+    display: none;
+}
+
+/* ✅ 或者使用相邻选择器 */
+.right-sidebar:has(.toc-section.sticky) .cloud-section,
+.right-sidebar:has(.toc-section.sticky) .search-section {
+    display: none;
 }
 
 .toc-section::-webkit-scrollbar {
@@ -1162,7 +1182,7 @@ html[data-theme="dark"] .tab-header.dir-left .tab-indicator {
 #toc .li {
     border: 1px solid var(--background-color);
     border-radius: 5px;
-    transition: all 0.3s ease;
+    transition: border-color .3s ease, background-color .3s ease;
 }
 
 #toc .li:hover {
@@ -1253,7 +1273,7 @@ html[data-theme="dark"] .tab-header.dir-left .tab-indicator {
     font-size: 0.95rem;
     padding: 10px 12px;
     color: var(--text-color);
-    transition: all 0.3s ease;
+    transition: color .3s ease;
 }
 
 .search-input::placeholder {

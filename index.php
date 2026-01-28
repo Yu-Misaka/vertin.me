@@ -6,7 +6,7 @@
  * 
  * @package PureSuck
  * @author MoXiify
- * @version 1.3.0
+ * @version 1.3.1
  * @link https://www.moxiify.cn
  */
 if (!defined('__TYPECHO_ROOT_DIR__'))
@@ -20,8 +20,8 @@ $this->need('header.php');
         <?php
         $hasImg = $this->fields->img ? true : false;
         ?>
-        <article class="post <?= $hasImg ? 'post--photo post--cover' : 'post--text'; ?> post--index main-item">
-            <div class="post-inner" data-aos="fade-up" data-aos-anchor-placement="top-bottom">
+        <article class="post <?= $hasImg ? 'post--photo post--cover' : 'post--text'; ?> post--index main-item <?= $this->hidden ? 'post-protected' : ''; ?>" data-protected="<?= $this->hidden ? 'true' : 'false'; ?>" data-ps-post-key="<?= $this->cid; ?>">
+            <div class="post-inner">
                 <?php
                 $showCardCategory = isset($this->options->showCardCategory)
                     && $this->options->showCardCategory === '1';
@@ -45,7 +45,9 @@ $this->need('header.php');
                 <header class="post-item post-header  <?= $hasImg ? 'no-bg' : ''; ?>">
                     <div class="wrapper post-wrapper">
                         <div class="avatar post-author">
-                            <img src="<?= $this->options->authorAvatar ?: $this->options->themeUrl('images/avatar.png'); ?>" alt="作者头像" class="avatar-item avatar-img">
+                            <img src="<?= $this->options->authorAvatar ?: $this->options->themeUrl('images/avatar.webp'); ?>"
+                                alt="作者头像" class="avatar-item avatar-img"
+                                loading="lazy" decoding="async" fetchpriority="low">
                             <span class="avatar-item">Suzuka</span>
                         </div>
                     </div>
@@ -54,8 +56,9 @@ $this->need('header.php');
                 <!-- 大图样式 -->
                 <?php if ($hasImg): ?>
                     <figure class="post-media <?= $this->is('post') ? 'single' : ''; ?>">
-                        <img data-aos="zoom-out" data-aos-anchor-placement="top-bottom" itemprop="image"
-                            src="<?php $this->fields->img(); ?>" alt="头图" width="2000" height="800">
+                        <img itemprop="image"
+                            src="<?php $this->fields->img(); ?>" alt="头图"
+                            loading="lazy" decoding="async" fetchpriority="auto">
                     </figure>
                 <?php endif; ?>
 
@@ -69,12 +72,7 @@ $this->need('header.php');
                         </h1>
 
                         <!-- 摘要 -->
-                        <?php if (
-                            isset($this->password)
-                            && $this->password !== Typecho_Cookie::get('protectPassword')
-                            && $this->authorId !== $this->user->uid
-                            && !$this->user->pass('editor', true)
-                        ): ?>
+                        <?php if ($this->hidden): ?>
                             <p class="post-excerpt">该文章已加密，请输入密码后查看。</p>
                         <?php else: ?>
                             <p class="post-excerpt">

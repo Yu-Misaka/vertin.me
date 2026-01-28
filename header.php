@@ -20,214 +20,124 @@
         ], '', ' - '); ?>
         <?= $this->options->title(); ?>
     </title>
-
-    <link rel="stylesheet" href="<?= $this->options->themeUrl('css/fontello.css'); ?>">
-    <link rel="stylesheet" href="<?= $this->options->themeUrl('css/PureSuck_Style.css'); ?>">
-    <link rel="stylesheet" href="<?php $this->options->themeUrl('/css/result.css'); ?>">
-
     <?php generateDynamicCSS(); ?>
-    <!-- Initial Theme Script -->
+
     <script>
-        (function () {
-            const savedTheme = localStorage.getItem('theme');
-            const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            const initialTheme = savedTheme === 'auto' || !savedTheme ? systemTheme : savedTheme;
-            document.documentElement.setAttribute('data-theme', initialTheme);
-        })();
+        window.THEME_URL = '<?= $this->options->themeUrl; ?>';
     </script>
 
+    <!-- 主题防闪烁脚本 -->
     <script>
-        (function () {
-            // 读取 Cookie 中的 theme
-            const matches = document.cookie.match(/(?:^|;)\s*theme=([^;]+)/);
-            let mode = matches ? matches[1] : "auto";
-
-            // auto 模式下，根据系统主题提前决定 effective 主题
-            if (mode === "auto") {
-                mode = window.matchMedia("(prefers-color-scheme: dark)").matches ?
-                    "dark" :
-                    "light";
+        (function(){
+            const cookieMatch=document.cookie.match(/(?:^|;)\s*theme=([^;]+)/),cookieTheme=cookieMatch?cookieMatch[1]:null;
+            const localTheme=localStorage.getItem('theme');
+            let initialTheme=cookieTheme||localTheme||'auto';
+            if(initialTheme==='auto'){
+                initialTheme=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
             }
-
-            // 提前设定 data-theme，避免闪烁
-            document.documentElement.setAttribute("data-theme", mode);
-        })();
-    </script>
-
-    <!-- Dark Mode -->
-    <script>
-        /* 自动获取根域名，例如 www.xxx.cn → .xxx.cn */
-        function getRootDomain() {
-            const host = window.location.hostname;
-            const parts = host.split(".");
-            if (parts.length <= 2) return host; // 如 localhost
-            return "." + parts.slice(-2).join(".");
-        }
-
-        /* 写入跨子域 Cookie，用于同步主题 */
-        function setThemeCookie(theme) {
-            const rootDomain = getRootDomain();
-            document.cookie = `theme=${theme}; path=/; domain=${rootDomain}; SameSite=Lax`;
-        }
-
-        /* 读取 Cookie */
-        function getCookie(name) {
-            const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
-            return match ? match[2] : null;
-        }
-
-        function setTheme(theme) {
-            // 自动模式 → 跟随系统
-            if (theme === "auto") {
-                const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-                document.documentElement.setAttribute("data-theme", systemTheme);
-                localStorage.setItem("theme", "auto");
-                setThemeCookie("auto");
-            } else {
-                // 明暗模式
-                document.documentElement.setAttribute("data-theme", theme);
-                localStorage.setItem("theme", theme);
-                setThemeCookie(theme);
-            }
-
-            updateIcon(theme);
-        }
-
-        function toggleTheme() {
-            const currentTheme = localStorage.getItem("theme") || "auto";
-            let newTheme;
-
-            if (currentTheme === "light") {
-                newTheme = "dark";
-                MoxToast({
-                    message: "已切换至深色模式"
-                });
-            } else if (currentTheme === "dark") {
-                newTheme = "auto";
-                MoxToast({
-                    message: "模式将跟随系统 ㆆᴗㆆ"
-                });
-            } else {
-                newTheme = "light";
-                MoxToast({
-                    message: "已切换至浅色模式"
-                });
-            }
-
-            setTheme(newTheme);
-        }
-
-        function updateIcon(theme) {
-            const iconElement = document.getElementById("theme-icon");
-            if (iconElement) {
-                iconElement.classList.remove("icon-sun-inv", "icon-moon-inv", "icon-auto");
-                if (theme === "light") {
-                    iconElement.classList.add("icon-sun-inv");
-                } else if (theme === "dark") {
-                    iconElement.classList.add("icon-moon-inv");
-                } else {
-                    iconElement.classList.add("icon-auto");
+            document.documentElement.setAttribute('data-theme',initialTheme);
+            try{
+                if(window.matchMedia&&!window.matchMedia('(prefers-reduced-motion:reduce)').matches){
+                    <?php if($this->is('index')||$this->is('archive')):?>
+                        document.documentElement.classList.add('ps-preload-list-enter');
+                    <?php elseif($this->is('post')):?>
+                        document.documentElement.classList.add('ps-preload-post-enter');
+                    <?php elseif($this->is('page')):?>
+                        document.documentElement.classList.add('ps-preload-page-enter');
+                    <?php endif;?>
                 }
-            }
-        }
-
-        /* 初始化：优先读取 Cookie → 保证跨站同步 */
-        document.addEventListener("DOMContentLoaded", function () {
-            const cookieTheme = getCookie("theme");
-            const savedTheme = cookieTheme || localStorage.getItem("theme") || "auto";
-            setTheme(savedTheme);
-        });
-
-        /* 系统主题变化时（仅 auto 模式生效） */
-        window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function (e) {
-            if (localStorage.getItem("theme") === "auto") {
-                const newTheme = e.matches ? "dark" : "light";
-                document.documentElement.setAttribute("data-theme", newTheme);
-                updateIcon("auto");
-            }
-        });
+            }catch(e){}
+        })();
     </script>
 
-    <script>
-        window.THEME_URL = "<?php $this->options->themeUrl(); ?>";
-    </script>
-    
-    <!-- 主题样式微调 -->
-    <!-- 标题线条 -->
-    <?php if ($this->options->postTitleAfter == 'off'): ?>
-        <style>
-            .post-title::after {
-                content: none !important;
-                display: none !important;
-            }
+    <!-- 性能优化：CSS 预加载 -->
+    <link rel="preload" href="<?= $this->options->themeUrl('css/PureSuck_Style.css'); ?>" as="style">
+    <link rel="stylesheet" href="<?= $this->options->themeUrl('css/PureSuck_Style.css'); ?>">
 
-            .post-title {
-                margin: 0;
-            }
-        </style>
-    <?php else: ?>
-        <style>
-            .post-title::after {
-                bottom:
-                    <?= $this->options->postTitleAfter == 'wavyLine' ? '-5px' : '5px'; ?>
-                ;
-                left: 0;
-                <?php if ($this->options->postTitleAfter == 'boldLine'): ?>
-                    width: 58px;
-                    height: 13px;
-                <?php elseif ($this->options->postTitleAfter == 'wavyLine'): ?>
-                    width: 80px;
-                    height: 12px;
-                    mask:
-                        <?= "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"40\" height=\"10\" viewBox=\"0 0 40 10\" preserveAspectRatio=\"none\"><path d=\"M0 5 Q 10 0, 20 5 T 40 5\" stroke=\"black\" stroke-width=\"2\" fill=\"transparent\"/></svg>') repeat-x"; ?>
-                    ;
-                    mask-size: 40px 12px;
-                <?php elseif ($this->options->postTitleAfter == 'handDrawn'): ?>
-                    /* handDrawn... */
-                <?php endif; ?>
-            }
-        </style>
-    <?php endif; ?>
-    <!-- AOS -->
-    <script defer src="<?php getStaticURL("aos.js") ?>"></script>
+    <link rel="preload" href="<?= $this->options->themeUrl('css/fontello.css'); ?>" as="style">
+    <link rel="stylesheet" href="<?= $this->options->themeUrl('css/fontello.css'); ?>">
+
     <!-- ICON Setting -->
     <link rel="icon"
         href="<?= isset($this->options->logoUrl) && $this->options->logoUrl ? $this->options->logoUrl : $this->options->themeUrl . '/images/avatar.ico'; ?>"
         type="image/x-icon">
-    <!-- CSS引入 -->
-    <link href="<?php $this->options->themeUrl('/css/code-reading.css'); ?>" rel="stylesheet">
-    <link href="<?php $this->options->themeUrl('/css/PureSuck_Module.css'); ?>" rel="stylesheet">
-    <link href="<?php getStaticURL(path: 'aos.css'); ?>" rel="stylesheet">
-    <link defer href="<?php $this->options->themeUrl('/css/MoxDesign.css'); ?>" rel="stylesheet">
-    <link href="<?php $this->options->themeUrl('/css/APlayer.min.css'); ?>" rel="stylesheet">
-    <link href="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/KaTeX/0.16.9/katex.min.css" rel="stylesheet">
-    <!-- JS引入 -->
+
+    <!-- 关键CSS同步加载（避免FOUC） -->
+    <link rel="stylesheet" href="<?php $this->options->themeUrl('/css/PureSuck_Module.css'); ?>">
+    <link rel="stylesheet" href="<?php $this->options->themeUrl('/css/MoxDesign.css'); ?>">
+    <link rel="stylesheet" href="<?php $this->options->themeUrl('/css/animations/index.css'); ?>">
+
+    <!-- 自定义：字体-->
+    <link rel="stylesheet" href="<?php $this->options->themeUrl('/css/result.css'); ?>">
+
+    <!-- 自定义：APlayer CSS -->
+    <link rel="stylesheet" href="<?php $this->options->themeUrl('/css/APlayer.min.css'); ?>">
+
+    <!-- 自定义：KaTeX CSS -->
+    <link rel="stylesheet" href="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/KaTeX/0.16.9/katex.min.css">
+
+    <!-- 标题线条 -->
+    <?php if ($this->options->postTitleAfter != 'off'): ?>
+        <style>
+            .post-title::after {
+                bottom: <?php echo $this->options->postTitleAfter == 'wavyLine' ? '-5px' : '5px'; ?>;
+                left: <?php echo '0'; ?>;
+                <?php if ($this->options->postTitleAfter == 'boldLine'): ?>width: <?php echo '58px'; ?>;
+                height: <?php echo '11px'; ?>;
+                <?php elseif ($this->options->postTitleAfter == 'wavyLine'): ?>width: <?php echo '106px'; ?>;
+                height: <?php echo '12px'; ?>;
+                mask: <?php echo "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"40\" height=\"10\" viewBox=\"0 0 40 10\" preserveAspectRatio=\"none\"><path d=\"M0 5 Q 10 0, 20 5 T 40 5\" stroke=\"black\" stroke-width=\"2\" fill=\"transparent\"/></svg>') repeat-x"; ?>;
+                mask-size: <?php echo '40px 12px'; ?>;
+                <?php elseif ($this->options->postTitleAfter == 'handDrawn'): ?>
+                /* 添加手绘风格的样式 */
+                /* 这里可以添加具体的手绘风格的样式 */
+                <?php endif; ?>
+            }
+        </style>
+    <?php endif; ?>
+
+    <!-- JS引入：按优先级分组加载（性能优化版） -->
+
+    <!-- 高优先级：核心模块（首屏必需） -->
     <script defer src="<?php getStaticURL(path: 'medium-zoom.min.js'); ?>"></script>
-    <script defer src="<?php getStaticURL(path: 'highlight.min.js'); ?>"></script>
     <script defer src="<?php $this->options->themeUrl('/js/PureSuck_Module.js'); ?>"></script>
-    <script defer src="<?php $this->options->themeUrl('/js/OwO.min.js'); ?>"></script>
     <script defer src="<?php $this->options->themeUrl('/js/MoxDesign.js'); ?>"></script>
+
+    <!-- Swup 4：页面过渡动画 -->
+    <script defer src="<?php getStaticURL(path: 'Swup.umd.min.js'); ?>"></script>
+    <script defer src="<?php $this->options->themeUrl('/js/lib/Swup/scroll-plugin.js'); ?>"></script>
+    <script defer src="<?php $this->options->themeUrl('/js/lib/Swup/preload-plugin.js'); ?>"></script>
+    <script defer src="<?php $this->options->themeUrl('/js/lib/Swup/head-plugin.js'); ?>"></script>
+    <script defer src="<?php $this->options->themeUrl('/js/PureSuck_Swup.js'); ?>"></script>
+
+    <!-- 低优先级：按需加载（评论区） -->
+    <script async src="<?php $this->options->themeUrl('/js/OwO.min.js'); ?>"></script>
+
+    <!-- 自定义：KaTeX JS -->
     <script defer src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
     <script defer src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+
+    <!-- 自定义：APlayer JS -->
     <script src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/aplayer/1.10.1/APlayer.min.js"></script>
-    <script defer src="https://cdn.academe.city/vertin.me/lib/lean.min.js"></script>
-    <script defer src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/highlight.js/11.11.1/languages/mathematica.min.js"></script>
-    <!-- LATEX -->
+    
+    <!-- 自定义：LaTeX 渲染 -->
     <script defer type="text/javascript">
         function renderLatex() {
-            renderMathInElement(document.body, {
-                delimiters: [{
-                    left: "$$",
-                    right: "$$",
-                    display: true
-                }, {
-                    left: "$",
-                    right: "$",
-                    display: false
-                }],
-                ignoredTags: ["script", "noscript", "style", "textarea", "pre", "code"],
-                ignoredClasses: ["nokatex"]
-            });
+            if (typeof renderMathInElement !== 'undefined') {
+                renderMathInElement(document.body, {
+                    delimiters: [{
+                        left: "$$",
+                        right: "$$",
+                        display: true
+                    }, {
+                        left: "$",
+                        right: "$",
+                        display: false
+                    }],
+                    ignoredTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+                    ignoredClasses: ["nokatex"]
+                });
+            }
         }
     
         document.addEventListener("DOMContentLoaded", function() {
@@ -235,80 +145,22 @@
         });
     </script>
 
-    <!-- Pjax -->
-    <?php if ($this->options->enablepjax == '1'): ?>
-        <script defer src="<?php getStaticURL('pjax.min.js'); ?>"></script>
-        <script type="text/javascript">
-            document.addEventListener('DOMContentLoaded', function () {
-                var pjax = new Pjax({
-                    history: true,
-                    scrollRestoration: true,
-                    cacheBust: false,
-                    timeout: 6500,
-                    elements: 'a[href^="<?php Helper::options()->siteUrl() ?>"]:not(a[target="_blank"], a[no-pjax]), form[action]:not([no-pjax])',
-                    selectors: [
-                        "pjax",
-                        "script[data-pjax]",
-                        "title",
-                        ".nav.header-item.header-nav",
-                        ".main",
-                        ".right-sidebar"
-                    ]
-                });
-            });
-
-            // Pjax 加载超时时跳转，不然它不给你跳转的！！！
-            document.addEventListener('pjax:error', function (e) {
-                console.error(e);
-                console.log('pjax error: \n' + JSON.stringify(e));
-                window.location.href = e.triggerElement.href;
-            });
-
-            // Pjax 完成后 JS 重载
-            document.addEventListener("pjax:success", function (event) {
-
-                // 短代码及模块部分
-                runShortcodes();
-
-                // TOC吸附
-                initializeStickyTOC();
-
-                // AOS 动画
-                AOS.refresh();
-
-                // 确保代码块高亮
-                <?php $codeBlockSettings = Typecho_Widget::widget('Widget_Options')->codeBlockSettings; ?>
-                document.querySelectorAll('pre code').forEach((block) => {
-                    hljs.highlightElement(block);
-                    <?php if (is_array($codeBlockSettings) && in_array('ShowLineNumbers', $codeBlockSettings)): ?>
-                        addLineNumber(block);
-                    <?php endif; ?>
-                });
-                <?php if (is_array($codeBlockSettings) && in_array('ShowCopyButton', $codeBlockSettings)): ?>
-                    addCopyButtons();
-                <?php endif; ?>
-
-                <?php if ($this->options->PjaxScript): ?>
-                    <?= $this->options->PjaxScript; ?>
-                <?php endif; ?>
-
+    <?php if ($this->options->PjaxScript): ?>
+        <script defer>
+            // 注册用户自定义回调（Swup page:view 后执行）
+            window.pjaxCustomCallback = function () {
+                <?= $this->options->PjaxScript; ?>
+                // 自定义：Swup 切换后重新渲染 LaTeX
                 renderLatex();
-                // hljs.highlightAll();
-                
-                // 评论区部分重载
-                if (document.querySelector('.OwO-textarea')) {
-                    initializeCommentsOwO();
-                }
-
-                Comments_Submit();
-            });
+            };
         </script>
-        <script defer data-pace-options='{ "eventLag": false }' src="<?php getStaticURL('pace.min.js'); ?>"></script>
-        <link rel="stylesheet" href="<?php getStaticURL('pace-theme-default.min.css'); ?>">
     <?php else: ?>
-        <!-- 是不是 Pjax 有 bug，哈哈哈 --kissablecho -->
-        <!-- 没错我差点死在自己留的鬼判定了--MoXi -->
-        <!-- 写这段 Pjax 代码的人猝死掉了，哈哈哈 --kissablecho -->
+        <script defer>
+            // 自定义：Swup 切换后重新渲染 LaTeX
+            window.pjaxCustomCallback = function () {
+                renderLatex();
+            };
+        </script>
     <?php endif; ?>
 </head>
 
@@ -320,7 +172,8 @@
                     aria-label="博主名字">
                     <span class="el-avatar el-avatar--circle avatar-hover-effect">
                         <img src="<?= $this->options->logoIndex; ?>" style="object-fit:cover;" alt="博主头像" width="120"
-                            height="120" data-name="博主名字" draggable="false">
+                            height="120" data-name="博主名字" draggable="false"
+                            fetchpriority="high" decoding="async" loading="eager">
                     </span>
                 </a>
                 <div class="header-title">
@@ -382,4 +235,15 @@
                 </style>
             </div>
         </header>
-        <main class="main">
+        <?php
+        $psPageType = 'list';
+        if ($this->is('post')) {
+            $psPageType = 'post';
+        } elseif ($this->is('page')) {
+            $psPageType = 'page';
+        } elseif ($this->is('index') || $this->is('archive')) {
+            $psPageType = 'list';
+        }
+        ?>
+        <div id="swup" data-ps-page-type="<?= $psPageType; ?>">
+            <main class="main">

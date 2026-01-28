@@ -15,7 +15,7 @@ $this->need('header.php');
     $hasImg = $this->fields->img ? true : false;
     ?>
     <article class="post <?= $hasImg ? 'post--photo post--cover' : 'post--text'; ?> post--index main-item">
-        <div class="post-inner" data-aos="fade-up" data-aos-anchor-placement="top-bottom">
+        <div class="post-inner">
             <header class="post-item post-header  <?= $hasImg ? 'no-bg' : ''; ?>">
                 <div class="wrapper post-wrapper">
                     <div class="avatar post-author">
@@ -28,8 +28,8 @@ $this->need('header.php');
             <!-- 大图样式 -->
             <?php if ($hasImg): ?>
                 <figure class="post-media <?= $this->is('post') ? 'single' : ''; ?>">
-                    <img data-aos="zoom-out" data-aos-anchor-placement="top-bottom" itemprop="image"
-                        src="<?php $this->fields->img(); ?>" alt="头图" width="2000" height="800">
+                    <img itemprop="image"
+                        src="<?php $this->fields->img(); ?>" alt="头图">
                 </figure>
             <?php endif; ?>
 
