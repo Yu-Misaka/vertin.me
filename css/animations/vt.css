@@ -33,137 +33,68 @@
  * 使用 ps-theme-vt 类标识主题切换过程
  */
 
-/* 主题切换淡出动画 */
-@keyframes ps-theme-fade-out {
+/* 主题切换统一动画（通过 reverse 反向播放实现淡入） */
+@keyframes ps-theme-fade {
 	from {
 		opacity: 1;
 	}
 	to {
 		opacity: 0;
-	}
-}
-
-/* 主题切换淡入动画 */
-@keyframes ps-theme-fade-in {
-	from {
-		opacity: 0;
-	}
-	to {
-		opacity: 1;
 	}
 }
 
 /* 主题切换时的 VT 动画 */
 html.ps-theme-vt::view-transition-old(root) {
-	animation: ps-theme-fade-out var(--ps-anim-duration-vt) ease;
+	animation: ps-theme-fade var(--ps-anim-duration-vt) ease forwards;
 }
 
 html.ps-theme-vt::view-transition-new(root) {
-	animation: ps-theme-fade-in calc(var(--ps-anim-duration-vt) + 40ms) ease;
+	animation: ps-theme-fade var(--ps-anim-duration-vt) ease reverse forwards;
+	animation-delay: 40ms;
 }
 
 /* ==================== 共享元素 View Transitions ==================== */
 
-:root {
-	/* View Transitions 动画参数 - 更短更干脆 */
-	--ps-vt-duration: 380ms;
-	/* 快速启动 → 平稳减速，更有活力 */
-	--ps-vt-easing: cubic-bezier(0.22, 0.68, 0.35, 1.0);
-	--ps-vt-radius: 0.85rem;
-}
+/*
+ * 使用 [data-ps-vt-name] 属性选择器替代 html.ps-vt-mode
+ * 减少样式计算范围：只检查已标记元素，而非全部 DOM
+ */
 
 /* 共享元素容器 - 基础样式 */
 [data-ps-vt-name] {
 	contain: layout style;
 }
 
-/* VT 期间隐藏文章正文 */
-.post--single[data-ps-vt-name] .post-content[data-ps-vt-hidden] > * {
-	opacity: 0;
-	transform: translate3d(0, 12px, 0);
+/* ==================== 单元素 VT（简化版） ==================== */
+
+/*
+ * 简化 VT：只保留容器 morph，减少浏览器计算开销
+ * 多元素 morph 会导致多次快照计算，每次都是长任务
+ * title 和 author 改为跟随容器动画，不单独 morph
+ */
+[data-ps-vt-name^="ps-post-"] {
+	contain: layout style;
 }
 
-/* 正文子元素逐个显示的渐入动画 */
-.post--single .post-content[data-ps-vt-hidden="animating"] > * {
-	animation: ps-content-fade-in 0.4s ease forwards;
-}
+/* ==================== 共享元素动画关键帧 ==================== */
 
-/* 逐个显示的 stagger 延迟 */
-.post--single .post-content[data-ps-vt-hidden="animating"] > *:nth-child(1) { animation-delay: 0ms; }
-.post--single .post-content[data-ps-vt-hidden="animating"] > *:nth-child(2) { animation-delay: 30ms; }
-.post--single .post-content[data-ps-vt-hidden="animating"] > *:nth-child(3) { animation-delay: 40ms; }
-.post--single .post-content[data-ps-vt-hidden="animating"] > *:nth-child(4) { animation-delay: 50ms; }
-.post--single .post-content[data-ps-vt-hidden="animating"] > *:nth-child(5) { animation-delay: 55ms; }
-.post--single .post-content[data-ps-vt-hidden="animating"] > *:nth-child(6) { animation-delay: 60ms; }
-.post--single .post-content[data-ps-vt-hidden="animating"] > *:nth-child(7) { animation-delay: 65ms; }
-.post--single .post-content[data-ps-vt-hidden="animating"] > *:nth-child(8) { animation-delay: 70ms; }
-.post--single .post-content[data-ps-vt-hidden="animating"] > *:nth-child(9) { animation-delay: 75ms; }
-.post--single .post-content[data-ps-vt-hidden="animating"] > *:nth-child(10) { animation-delay: 80ms; }
-
-/* 10个以后的元素，每8个一批，批次间隔80ms */
-.post--single .post-content[data-ps-vt-hidden="animating"] > *:nth-child(n+11):nth-child(-n+18) { animation-delay: 90ms; }
-.post--single .post-content[data-ps-vt-hidden="animating"] > *:nth-child(n+19):nth-child(-n+26) { animation-delay: 100ms; }
-.post--single .post-content[data-ps-vt-hidden="animating"] > *:nth-child(n+27):nth-child(-n+34) { animation-delay: 110ms; }
-.post--single .post-content[data-ps-vt-hidden="animating"] > *:nth-child(n+35):nth-child(-n+42) { animation-delay: 120ms; }
-.post--single .post-content[data-ps-vt-hidden="animating"] > *:nth-child(n+43) { animation-delay: 130ms; }
-
-@keyframes ps-content-fade-in {
+/* 统一的退出动画 */
+@keyframes ps-vt-shared-exit {
 	from {
-		opacity: 0;
-		transform: translate3d(0, 12px, 0);
-	}
-	to {
-		opacity: 1;
-		transform: translate3d(0, 0, 0);
-	}
-}
-
-/* ==================== 共享元素退出动画（列表页卡片） ==================== */
-
-/* 旧元素（列表页卡片）退出动画 - 简单淡出，不抢戏 */
-@keyframes ps-vt-card-exit {
-	0% {
 		opacity: 1;
 		transform: scale(1);
 	}
-	100% {
+	to {
 		opacity: 0;
 		transform: scale(1.01);
 	}
 }
 
-/* 新元素（文章页容器）进入动画 - 主角登场 */
-@keyframes ps-vt-article-enter {
+/* 统一的进入动画 */
+@keyframes ps-vt-shared-enter {
 	0% {
 		opacity: 0;
 		transform: scale(0.97) translateY(8px);
-	}
-	60% {
-		opacity: 1;
-	}
-	100% {
-		opacity: 1;
-		transform: scale(1) translateY(0);
-	}
-}
-
-/* 从文章返回列表时 - 旧元素退出 */
-@keyframes ps-vt-article-exit {
-	0% {
-		opacity: 1;
-		transform: scale(1);
-	}
-	100% {
-		opacity: 0;
-		transform: scale(1.01);
-	}
-}
-
-/* 从文章返回列表时 - 新元素（卡片）进入 */
-@keyframes ps-vt-card-enter {
-	0% {
-		opacity: 0;
-		transform: scale(0.97) translateY(6px);
 	}
 	60% {
 		opacity: 1;
@@ -183,22 +114,24 @@ html.ps-theme-vt::view-transition-new(root) {
 
 /* 共享元素 old/new 的动画 - 排除 root */
 ::view-transition-old(*):not(::view-transition-old(root)) {
-	animation: ps-vt-card-exit var(--ps-vt-duration) var(--ps-vt-easing) both;
+	animation: ps-vt-shared-exit var(--ps-vt-duration) var(--ps-vt-easing) both;
 	border-radius: var(--ps-vt-radius);
 	overflow: hidden;
 }
 
 ::view-transition-new(*):not(::view-transition-new(root)) {
-	animation: ps-vt-article-enter var(--ps-vt-duration) var(--ps-vt-easing) both;
+	animation: ps-vt-shared-enter var(--ps-vt-duration) var(--ps-vt-easing) both;
 	border-radius: var(--ps-vt-radius);
 	overflow: hidden;
 }
 
 /* ==================== VT 模式下的页面过渡优化 ==================== */
 
-/* VT 模式标识 */
-html.ps-vt-mode {
-	/* VT 期间避免滚动干扰 */
+/*
+ * VT 期间滚动控制
+ * 使用 :has() 选择器检测 #swup.ps-vt-mode，避免在 html 上添加类
+ */
+html:has(#swup.ps-vt-mode) {
 	scroll-behavior: auto !important;
 }
 

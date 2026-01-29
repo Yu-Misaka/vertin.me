@@ -28,12 +28,27 @@
 
     // ==================== View Transitions 配置 ====================
     const VT = {
-        styleId: 'ps-vt-shared-element-style',
         markerAttr: 'data-ps-vt-name',
         duration: 380,  // 与 CSS 保持一致
         easing: 'cubic-bezier(0.22,0.68,0.35,1.0)',
         // 预计算选择器字符串，避免重复拼接
         markerSelector: '[data-ps-vt-name]'
+    };
+
+    // ==================== 多元素 VT 配置 ====================
+    const VT_CONFIG = {
+        elements: {
+            // ★ 简化 VT：只保留容器 morph，减少浏览器计算开销
+            // 多元素 morph 会导致多次快照计算，每次都是长任务
+            container: { prefix: 'ps-post', listSel: null, singleSel: null, required: true }
+            // title 和 author 改为跟随容器动画，不单独 morph
+        },
+        fadeOut: ['.post-excerpt', '.post-footer', '.post-cat-vertical']
+    };
+
+    // 追踪当前标记的 VT 元素
+    let _currentVTElements = {
+        container: null
     };
 
     // ==================== 页面类型定义 ====================
@@ -134,39 +149,64 @@
         runNext();
     }
 
-    // ==================== 简化的任务调度器 ====================
-    // 轻量级批量处理器，避免过度设计
+    // ==================== 任务调度器 ====================
+    // 轻量级批量处理器，固定批次大小
     const TaskScheduler = {
         async run(items, handler, options = {}) {
             if (!items?.length) return;
 
-            // ✅ 小数组直接同步处理，避免 Promise/RAF 开销
-            if (items.length <= 8) {
+            const batchSize = 8;
+
+            // 小数组直接同步处理，避免 Promise/RAF 开销
+            if (items.length <= batchSize) {
                 for (let i = 0; i < items.length; i++) {
-                    try {
-                        handler(items[i], i);
-                    } catch (e) {}
+                    try { handler(items[i], i); } catch (e) {}
                 }
                 return;
             }
 
-            const batchSize = 8; // 固定批次大小，避免复杂的自适应逻辑
-
             for (let i = 0; i < items.length; i += batchSize) {
                 const end = Math.min(i + batchSize, items.length);
-
-                // 使用RAF批量处理，避免阻塞主线程
                 await new Promise(resolve => {
                     requestAnimationFrame(() => {
                         for (let j = i; j < end; j++) {
-                            try {
-                                handler(items[j], j);
-                            } catch (e) {}
+                            try { handler(items[j], j); } catch (e) {}
                         }
                         resolve();
                     });
                 });
             }
+        }
+    };
+
+    // ==================== DOM 查询缓存 ====================
+    // 页面切换期间缓存 DOM 查询结果，避免重复查询
+    const DOMCache = {
+        _cache: new Map(),
+        _token: 0,
+
+        // 页面切换时失效缓存
+        invalidate() {
+            this._cache.clear();
+            this._token++;
+        },
+
+        // 缓存单个查询结果
+        query(selector, scope = document) {
+            const key = `${this._token}:${selector}`;
+            if (!this._cache.has(key)) {
+                this._cache.set(key, scope.querySelector(selector));
+            }
+            return this._cache.get(key);
+        },
+
+        // 缓存多个查询结果
+        queryAll(selector, scope = document) {
+            const key = `${this._token}:all:${selector}`;
+            if (!this._cache.has(key)) {
+                this._cache.set(key, Array.from(scope.querySelectorAll(selector)));
+            }
+            return this._cache.get(key);
         }
     };
 
@@ -193,31 +233,103 @@
         STATE.lastPost.key = postKey;
     }
 
-    function clearMarkedViewTransitionNames() {
-        // 使用预计算的选择器，避免模板字符串拼接
-        const elements = document.querySelectorAll(VT.markerSelector);
-        for (let i = 0; i < elements.length; i++) {
-            const el = elements[i];
-            el.style.viewTransitionName = '';
-            el.removeAttribute(VT.markerAttr);
+    /**
+     * 生成元素的 VT 名称
+     * @param {string} type - 元素类型（container, cover, title, avatar, author）
+     * @param {string} postKey - 文章唯一标识
+     */
+    function getElementVTName(type, postKey) {
+        const cfg = VT_CONFIG.elements[type];
+        if (!cfg) return null;
+        const safeKey = encodeURIComponent(String(postKey)).replace(/%/g, '_');
+        return `${cfg.prefix}-${safeKey}`;
+    }
+
+    /**
+     * 清理所有 VT 标记（多元素版本）
+     */
+    function clearAllVTNames() {
+        let hasTracked = false;
+        for (const type in _currentVTElements) {
+            const el = _currentVTElements[type];
+            if (el) {
+                hasTracked = true;
+                el.style.viewTransitionName = '';
+                el.removeAttribute(VT.markerAttr);
+                _currentVTElements[type] = null;
+            }
+        }
+        // 回退：追踪失效时使用 DOM 查询 O(n)
+        if (!hasTracked) {
+            const elements = document.querySelectorAll(VT.markerSelector);
+            for (let i = 0; i < elements.length; i++) {
+                elements[i].style.viewTransitionName = '';
+                elements[i].removeAttribute(VT.markerAttr);
+            }
         }
     }
 
     /**
-     * 应用文章卡片共享元素的 View Transitions 名称
-     * 优化：移除动态 style 插入，改用静态 CSS
-     * 性能提升：消除强制布局和样式重计算
+     * 应用多元素 VT 名称（列表卡片）
+     * @param {HTMLElement} cardEl - 卡片元素
+     * @param {string} postKey - 文章唯一标识
      */
+    function applyMultiVTNames(cardEl, postKey) {
+        if (!cardEl || !postKey) return;
+
+        // 检查是否是相同卡片（跳过重复设置）
+        if (_currentVTElements.container === cardEl) {
+            const existingName = cardEl.style.viewTransitionName;
+            const expectedName = getElementVTName('container', postKey);
+            if (existingName === expectedName) return;
+        }
+
+        clearAllVTNames();
+
+        for (const type in VT_CONFIG.elements) {
+            const { listSel } = VT_CONFIG.elements[type];
+            const el = type === 'container' ? cardEl : cardEl.querySelector(listSel);
+            if (el) {
+                const name = getElementVTName(type, postKey);
+                el.style.viewTransitionName = name;
+                el.setAttribute(VT.markerAttr, name);
+                _currentVTElements[type] = el;
+            }
+        }
+    }
+
+    /**
+     * 同步文章页多元素 VT 名称
+     */
+    function syncPostMultiVTNames() {
+        const container = document.querySelector('.post.post--single');
+        let postKey = getPostKeyFromElement(container)
+                    || history.state?.lastPostKey
+                    || STATE.lastPost.key;
+
+        if (!postKey || !container) return;
+
+        rememberLastPostKey(postKey);
+
+        for (const type in VT_CONFIG.elements) {
+            const { singleSel } = VT_CONFIG.elements[type];
+            const el = type === 'container' ? container : container.querySelector(singleSel);
+            if (el) {
+                const name = getElementVTName(type, postKey);
+                el.style.viewTransitionName = name;
+                el.setAttribute(VT.markerAttr, name);
+                _currentVTElements[type] = el;
+            }
+        }
+    }
+
+    // 兼容旧调用的包装函数
+    function clearMarkedViewTransitionNames() {
+        clearAllVTNames();
+    }
+
     function applyPostSharedElementName(el, postKey) {
-        if (!el || !postKey) return;
-
-        const name = getPostTransitionName(postKey);
-        clearMarkedViewTransitionNames();
-
-        // 优化：直接设置 view-transition-name，不再动态生成 style 标签
-        // CSS 变量在静态 CSS 中定义 (vt.css)
-        el.style.viewTransitionName = name;
-        el.setAttribute(VT.markerAttr, name);
+        applyMultiVTNames(el, postKey);
     }
 
     function findIndexPostCardById(postKey) {
@@ -360,14 +472,21 @@
             'ps-post-enter',
             'ps-list-exit',
             'ps-list-enter',
-            'ps-vt-mode',
             'ps-pre-enter'
         );
+        // ★ ps-vt-mode 延迟移除，避免 content-visibility 恢复触发 reflow 阻塞 VT 动画
+        // VT 动画完成后再移除，让 reflow 在动画结束后发生
+        const vtDuration = VT.duration + 50; // 380ms + 50ms 缓冲
+        setTimeout(() => {
+            document.documentElement.classList.remove('ps-vt-mode');
+            getSwupRoot().classList.remove('ps-vt-mode');
+        }, vtDuration);
     }
 
     // ==================== 动画控制器 ====================
     const AnimController = {
-        activeAnimations: [],
+        _id: 0,
+        activeAnimations: new Map(),  // 使用 Map 替代数组，实现 O(1) 删除
         animatingElements: new WeakSet(), // 追踪正在动画的元素
 
         /**
@@ -376,7 +495,7 @@
          */
         abort() {
             // 1. 打断所有 Web Animations API 动画
-            for (const anim of this.activeAnimations) {
+            for (const { anim } of this.activeAnimations.values()) {
                 try {
                     if (anim && typeof anim.cancel === 'function') {
                         anim.cancel();
@@ -385,7 +504,7 @@
                     // 忽略错误
                 }
             }
-            this.activeAnimations = [];
+            this.activeAnimations.clear();
 
             // 2. 清理 CSS 动画类（复用统一的清理函数）
             cleanupAnimationClasses();
@@ -413,16 +532,18 @@
         register(anim, element = null) {
             if (!anim) return;
 
+            const id = ++this._id;
+
             // 追踪正在动画的元素，用于后续清理
             if (element) {
                 this.animatingElements.add(element);
+                element.setAttribute('data-ps-animating', '');
             }
 
-            this.activeAnimations.push(anim);
+            this.activeAnimations.set(id, { anim, element });
 
             const onEnd = () => {
-                const idx = this.activeAnimations.indexOf(anim);
-                if (idx > -1) this.activeAnimations.splice(idx, 1);
+                this.activeAnimations.delete(id);  // O(1) 删除
                 // 动画结束后立即清理元素
                 if (element) {
                     this.cleanupElement(element);
@@ -577,12 +698,7 @@
 
         if (!postBody) return [];
 
-        const selector = [
-            '.post-meta',
-            '.post-content > *',
-            '.protected-block',
-            '.license-info-card'
-        ].join(',');
+        const selector = ['.post-meta', '.post-content > *', '.protected-block', '.license-info-card'].join(',');
 
         const maxItems = ANIM.enter.post.maxItems;
         const reserveBelow = 8;
@@ -749,7 +865,7 @@
      * 轻量级进入动画
      * 优化：
      * 1. 使用 CSS 类替代内联样式设置初始状态
-     * 2. 动画开始时添加 will-change，结束后立即移除
+     * 2. 预计算 keyframes，避免循环内重复构建对象
      * 3. 减少不必要的 contain 属性设置
      */
     async function animateLightEnter(targets, baseDelay = 0, options = {}, skipInitialState = false) {
@@ -757,26 +873,25 @@
 
         const { duration = 380, stagger = 32, y = 16, scale = 1, easing = 'cubic-bezier(0.2, 0.8, 0.2, 1)' } = options;
 
+        // 预计算 keyframes（避免循环内重复构建）
+        const hasScale = scale !== 1;
+        const keyframes = [
+            { opacity: 0, transform: hasScale ? `translate3d(0,${y}px,0) scale(${scale})` : `translate3d(0,${y}px,0)` },
+            { opacity: 1, transform: hasScale ? 'translate3d(0,0,0) scale(1)' : 'translate3d(0,0,0)' }
+        ];
+        const baseOpts = { duration, easing, fill: 'both', composite: 'replace' };
+
         // 优化：不再使用内联样式设置初始状态，因为已在 setInitialAnimationState 中设置
         if (!skipInitialState) {
             // 备用：如果需要设置初始状态，使用类名而不是内联样式
-            const className = scale !== 1 ? 'ps-enter-hidden-page-card' : 'ps-enter-hidden-post';
+            const className = hasScale ? 'ps-enter-hidden-page-card' : 'ps-enter-hidden-post';
             await TaskScheduler.run(targets, (el) => {
                 el.classList.add(className);
             }, { priority: 'user-blocking' });
         }
 
         await TaskScheduler.run(targets, (el, index) => {
-            const anim = el.animate([
-                { opacity: 0, transform: `translate3d(0,${y}px,0)${scale !== 1 ? ` scale(${scale})` : ''}` },
-                { opacity: 1, transform: 'translate3d(0,0,0) scale(1)' }
-            ], {
-                duration,
-                easing,
-                delay: baseDelay + index * stagger,
-                fill: 'both',
-                composite: 'replace'
-            });
+            const anim = el.animate(keyframes, { ...baseOpts, delay: baseDelay + index * stagger });
 
             anim.onfinish = () => {
                 // 动画结束后清理样式
@@ -997,67 +1112,135 @@
         window.OwoManager?.init();
     }
 
+    // ==================== VT 同步辅助函数（重构版） ====================
+
     /**
-     * 同步共享元素的 VT 名称
+     * 获取上一个文章的 postKey
+     */
+    function getLastPostKey() {
+        const stateKey = history.state?.lastPostKey;
+        if (stateKey) return stateKey;
+        return STATE.lastPost.fromSingle ? STATE.lastPost.key : null;
+    }
+
+    /**
+     * 同步文章页的共享元素（使用多元素版本）
+     */
+    function syncPostPageSharedElement() {
+        syncPostMultiVTNames();
+    }
+
+    /**
+     * 确保旧页面的元素在 VT 开始前已设置 viewTransitionName
+     * 这是 VT 共享元素动画能工作的关键前提（多元素版本）
+     */
+    function ensureOldPageViewTransitionName(fromType) {
+        if (fromType === PageType.POST) {
+            // 从文章页离开：确保文章容器和子元素有 viewTransitionName
+            const postContainer = document.querySelector('.post.post--single');
+            if (postContainer && !postContainer.style.viewTransitionName) {
+                const postKey = getPostKeyFromElement(postContainer)
+                             || STATE.lastPost.key
+                             || history.state?.lastPostKey;
+                if (postKey) {
+                    syncPostMultiVTNames();
+                }
+            }
+        } else if (fromType === PageType.LIST) {
+            // 从列表页离开：检查是否已有标记的卡片
+            const markedCard = document.querySelector(VT.markerSelector);
+            if (!markedCard) {
+                // 没有标记的卡片，尝试从 state 恢复
+                const lastKey = STATE.lastPost.key || history.state?.lastPostKey;
+                if (lastKey) {
+                    const card = findIndexPostCardById(lastKey);
+                    if (card) {
+                        applyMultiVTNames(card, lastKey);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 初始加载时预设置 viewTransitionName
+     * 确保从当前页面导航离开时，VT 动画有正确的旧元素（多元素版本）
+     */
+    function presetViewTransitionNames() {
+        const pageType = getPageType(window.location.href);
+
+        if (pageType === PageType.POST) {
+            // 文章页：预设置文章容器和子元素的 viewTransitionName
+            syncPostMultiVTNames();
+        } else if (pageType === PageType.LIST) {
+            // 列表页：如果有上一篇文章的 key，预设置对应卡片
+            const lastKey = history.state?.lastPostKey || STATE.lastPost.key;
+            if (lastKey) {
+                const card = findIndexPostCardById(lastKey);
+                if (card) {
+                    applyMultiVTNames(card, lastKey);
+                }
+            }
+        }
+    }
+
+    /**
+     * 按需滚动元素到可见区域（使用 requestIdleCallback 调度）
+     */
+    function scheduleScrollIntoViewIfNeeded(el) {
+        requestIdleCallback(() => {
+            requestAnimationFrame(() => {
+                const rect = el.getBoundingClientRect();
+                if (rect.bottom < 0 || rect.top > window.innerHeight) {
+                    requestAnimationFrame(() => {
+                        el.scrollIntoView({ block: 'center', inline: 'nearest' });
+                    });
+                }
+            });
+        }, { timeout: 100 });
+    }
+
+    /**
+     * 同步列表页的共享元素（多元素版本）
+     */
+    function syncListPageSharedElement(scrollPlugin, listPostKey) {
+        const url = window.location.href;
+        const cachedY = scrollPlugin?.getCachedScrollPositions?.(url)?.window?.top;
+
+        if (typeof cachedY === 'number') {
+            window.scrollTo(0, cachedY);
+            queueMicrotask(() => window.scrollTo(0, cachedY));
+        }
+
+        const card = findIndexPostCardById(listPostKey);
+        if (!card) {
+            clearAllVTNames();
+            return;
+        }
+
+        applyMultiVTNames(card, listPostKey);
+        scheduleScrollIntoViewIfNeeded(card);
+    }
+
+    /**
+     * 同步共享元素的 VT 名称（主调度函数）
      * @param {Object} scrollPlugin - Swup 滚动插件实例
      * @param {boolean} isTransition - 是否是页面切换中（初始加载/刷新时为 false）
      */
     function syncPostSharedElementFromLocation(scrollPlugin, isTransition = true) {
-        const url = window.location.href;
-        const pageType = getPageType(url);
+        const pageType = getPageType(window.location.href);
 
         if (pageType === PageType.POST) {
-            const postContainer = document.querySelector('.post.post--single');
-            const postKey = getPostKeyFromElement(postContainer);
-            rememberLastPostKey(postKey);
-            applyPostSharedElementName(postContainer, postKey);
-
-            // 仅在页面切换时隐藏内容（VT 动画需要）
-            // 初始加载/刷新时不隐藏，因为没有过渡动画
-            if (isTransition) {
-                const postContent = postContainer?.querySelector('.post-content');
-                if (postContent) {
-                    postContent.setAttribute('data-ps-vt-hidden', 'true');
-                }
-            }
+            syncPostPageSharedElement();
             return;
         }
 
-        let listPostKey = (history.state && typeof history.state === 'object')
-            ? history.state.lastPostKey
-            : null;
-
-        if (!listPostKey && STATE.lastPost.fromSingle) {
-            listPostKey = STATE.lastPost.key;
-        }
-
-        if (pageType === PageType.LIST && listPostKey) {
-            const cached = scrollPlugin?.getCachedScrollPositions?.(url);
-            const cachedY = cached?.window?.top;
-            if (typeof cachedY === 'number') {
-                window.scrollTo(0, cachedY);
-                queueMicrotask(() => window.scrollTo(0, cachedY));
+        if (pageType === PageType.LIST) {
+            const listPostKey = getLastPostKey();
+            if (listPostKey) {
+                syncListPageSharedElement(scrollPlugin, listPostKey);
+                return;
             }
-
-            const card = findIndexPostCardById(listPostKey);
-            if (card) {
-                applyPostSharedElementName(card, listPostKey);
-                const checkAndScroll = () => {
-                    requestAnimationFrame(() => {
-                        const rect = card.getBoundingClientRect();
-                        if (rect.bottom < 0 || rect.top > window.innerHeight) {
-                            requestAnimationFrame(() => {
-                                card.scrollIntoView({ block: 'center', inline: 'nearest' });
-                            });
-                        }
-                    });
-                };
-
-                requestIdleCallback(checkAndScroll, { timeout: 100 });
-            } else {
-                clearMarkedViewTransitionNames();
-            }
-            return;
         }
 
         clearMarkedViewTransitionNames();
@@ -1422,6 +1605,9 @@
             STATE.lastNavigation.toUrl = visit.to?.url || '';
             STATE.lastNavigation.isSwup = true;
 
+            // ★ 确保旧页面元素在 VT 开始前已设置 viewTransitionName
+            ensureOldPageViewTransitionName(fromType);
+
             // 添加动画状态类
             document.documentElement.classList.add('ps-animating');
 
@@ -1438,7 +1624,8 @@
             const useVT = isClickingPostFromList || isReturningFromPost;
 
             if (useVT) {
-                document.documentElement.classList.add('ps-vt-mode');
+                // 添加到 #swup 而非 html，减少样式计算范围
+                getSwupRoot().classList.add('ps-vt-mode');
             }
 
             STATE.lastPost.fromSingle = fromType === PageType.POST;
@@ -1446,6 +1633,9 @@
 
         // ========== 动画流程：content:replace ==========
         swup.hooks.on('content:replace', () => {
+            // 页面切换时失效 DOM 缓存
+            DOMCache.invalidate();
+
             const toType = getPageType();
 
             STATE.isSwupNavigating = false;
@@ -1515,20 +1705,6 @@
             scheduleIdleTask(() => {
                 cleanupAnimationClasses();
             });
-
-            // VT 动画完成后，正文渐入显示
-            setTimeout(() => {
-                const hiddenContent = document.querySelector('.post-content[data-ps-vt-hidden]');
-                if (hiddenContent) {
-                    // 触发渐入动画
-                    hiddenContent.setAttribute('data-ps-vt-hidden', 'animating');
-                    // 动画完成后清理属性
-                    // 最晚元素：delay(130ms) + duration(400ms) = 530ms，设置 600ms 留出余量
-                    setTimeout(() => {
-                        hiddenContent.removeAttribute('data-ps-vt-hidden');
-                    }, 600);
-                }
-            }, 350); // 与 VT 动画同步
         });
 
         // ========== 页面加载完成 ==========
@@ -1682,8 +1858,9 @@
             markAnimationElements(getSwupRoot());
         });
 
-        // 初始加载时传入 false，避免设置 data-ps-vt-hidden 导致内容被隐藏
-        syncPostSharedElementFromLocation(undefined, false);
+        // 初始加载时预设置 viewTransitionName
+        // 确保离开当前页面时 VT 动画能正常工作
+        presetViewTransitionNames();
 
         // 修复初始加载闪烁：使用原子化类切换 + 提前设置内联样式
         STATE.lastNavigation.isSwup = false;
