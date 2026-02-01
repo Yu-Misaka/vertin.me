@@ -16,8 +16,8 @@
             <?php
             $hasImg = $this->fields->img ? true : false;
             ?>
-            <article class="post <?= $hasImg ? 'post--photo post--cover' : 'post--text'; ?> post--index main-item">
-                <div class="post-inner" data-aos="fade-up" data-aos-anchor-placement="top-bottom">
+            <article class="post <?= $hasImg ? 'post--photo post--cover' : 'post--text'; ?> post--index main-item" data-ps-post-key="<?= $this->cid; ?>">
+                <div class="post-inner">
                     <?php
                     $showCardCategory = isset($this->options->showCardCategory)
                         && $this->options->showCardCategory === '1';
@@ -49,7 +49,7 @@
                     <!-- 大图样式 -->
                     <?php if ($hasImg): ?>
                         <figure class="post-media <?= $this->is('post') ? 'single' : ''; ?>">
-                            <img data-aos="zoom-out" data-aos-anchor-placement="top-bottom" src="<?php $this->fields->img(); ?>"
+                            <img src="<?php $this->fields->img(); ?>"
                                 alt="头图" width="2000" height="800">
                         </figure>
                     <?php endif; ?>
@@ -62,12 +62,7 @@
                                 </a>
                             </h1>
                             <!-- 摘要 -->
-                            <?php if (
-                                isset($this->password)
-                                && $this->password !== Typecho_Cookie::get('protectPassword')
-                                && $this->authorId !== $this->user->uid
-                                && !$this->user->pass('editor', true)
-                            ): ?>
+                            <?php if ($this->hidden): ?>
                                 <p class="post-excerpt">该文章已加密，请输入密码后查看。</p>
                             <?php else: ?>
                                 <p class="post-excerpt">
@@ -102,7 +97,7 @@
             </article>
         <?php endwhile; ?>
     <?php else: ?>
-        <article class="post post--text post--index main-item" data-aos="fade-up" data-aos-anchor-placement="top-bottom">
+        <article class="post post--text post--index main-item">
             <div class="post-inner">
                 <section class="post-item post-body" style="margin-top: 0px;">
                     <div class="wrapper post-wrapper">

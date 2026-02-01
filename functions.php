@@ -16,6 +16,26 @@ function themeFields($layout)
 function themeInit($archive)
 {
     Helper::options()->commentsAntiSpam = false;
+
+    // ✅ 修复加密文章 PJAX 兼容性
+    // 只在 AJAX 请求时强制返回 200 状态码，避免 SEO 问题
+    if ($archive->is('single') && $archive->hidden && $archive->request->isAjax()) {
+        $archive->response->setStatus(200);
+    }
+
+    // AJAX 接口：获取 Token URL
+    if ($archive->is('post') && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['type']) && $_POST['type'] === 'getTokenUrl') {
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['tokenUrl' => Typecho_Widget::widget('Widget_Security')->getTokenUrl($archive->permalink)]);
+        exit;
+    }
+
+    // AJAX 接口：检查文章是否仍为加密状态
+    if ($archive->is('post') && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['type']) && $_POST['type'] === 'checkPassword') {
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['hidden' => $archive->hidden]);
+        exit;
+    }
 }
 
 function parseOwOcodes($content)
@@ -25,27 +45,32 @@ function parseOwOcodes($content)
         return $content;
     }
 
-    $jsonFile = __DIR__ . '/js/OwO.json';
-    if (!file_exists($jsonFile)) {
-        return $content;
-    }
-
-    $jsonContent = file_get_contents($jsonFile);
-    $shortcodes = json_decode($jsonContent, true);
-
-    if (!is_array($shortcodes)) {
-        return $content;
-    }
-
-    // 主题 URL（不是 siteUrl）
-    $themeUrl = rtrim(Helper::options()->themeUrl, '/');
-
     /**
-     * 构建一次性映射表
-     * :#(xxx) / :$(xxx) => <img>
+     * 使用static缓存映射表，避免重复的文件读取和JSON解析
+     * 第一次调用时构建，后续请求直接使用缓存
      */
     static $owoMap = null;
+
     if ($owoMap === null) {
+        // 只在第一次调用时读取文件和解析JSON
+        $jsonFile = __DIR__ . '/js/OwO.json';
+        if (!file_exists($jsonFile)) {
+            $owoMap = []; // 设置为空数组，避免重复检查
+            return $content;
+        }
+
+        $jsonContent = file_get_contents($jsonFile);
+        $shortcodes = json_decode($jsonContent, true);
+
+        if (!is_array($shortcodes)) {
+            $owoMap = []; // 设置为空数组，避免重复检查
+            return $content;
+        }
+
+        // 主题 URL（不是 siteUrl）
+        $themeUrl = rtrim(Helper::options()->themeUrl, '/');
+
+        // 构建映射表：:#(xxx) / :$(xxx) => <img>
         $owoMap = [];
 
         foreach ($shortcodes as $package) {
@@ -101,7 +126,8 @@ function parseOwOcodes($content)
         }
     }
 
-    if (!$owoMap) {
+    // 如果映射表为空，直接返回
+    if (empty($owoMap)) {
         return $content;
     }
 
@@ -178,8 +204,22 @@ function themeConfig($form)
             }
         }
     }
-    echo '
-    <h3>当前主题版本：<span style="color: #b45864;">1.3.0</span></h3>
+    // 获取最新版本号
+    $currentVersion = '1.3.1';
+    $latestVersion = getLatestGitHubRelease('MoXiaoXi233', 'PureSuck-theme');
+    $versionHtml = '<h3>当前主题版本：<span style="color: #b45864;">' . htmlspecialchars($currentVersion) . '</span>';
+
+    if ($latestVersion) {
+        if (version_compare($latestVersion, $currentVersion, '>')) {
+            $versionHtml .= ' <span style="color: #ff6b6b; font-size: 0.9em;">(有新版本: ' . htmlspecialchars($latestVersion) . ')</span>';
+        } else {
+            $versionHtml .= ' <span style="color: #51cf66; font-size: 0.9em;">(已是最新)</span>';
+        }
+    }
+
+    $versionHtml .= '</h3>';
+
+    echo $versionHtml . '
     <h4>主题开源页面及文档：<span style="color: #b45864;"><a href="https://github.com/MoXiaoXi233/PureSuck-theme" style="color: #3273dc; text-decoration: none;">PureSuck-theme</a></span></h4>
     <h5>*备份功能只在 SQL 环境下测试正常，遇到问题请清空配置重新填写*</h5>
     <form class="protected home" action="?' . $name . 'bf" method="post">
@@ -289,43 +329,18 @@ function themeConfig($form)
     );
     $form->addInput($footerInfo);
 
-    // Pjax 开关
-    // https://github.com/MoOx/pjax
+    // Swup 页面过渡动画（强制启用，无需开关）
+    // 主题依赖 Swup 实现页面切换动画和 AJAX 功能
 
-    $enablepjax = new Typecho_Widget_Helper_Form_Element_Radio(
-        'enablepjax',
-        array('1' => _t('启用'), '0' => _t('关闭')),
-        '1',
-        _t('是否启用 Pjax 加载（实验性）'),
-        _t('可以大幅提高页面加载效率和切换体验')
-    );
-    $form->addInput($enablepjax);
-
-    // Pjax回调函数
+    // Pjax回调函数（Swup）
     $PjaxScript = new \Typecho\Widget\Helper\Form\Element\Textarea(
         'PjaxScript',
         null,
         null,
-        _t('Pjax回调函数'),
-        _t('在这里填入需要被 Pjax 回调的函数，例如：loadDPlayer(); 如果不知道这是什么，请忽略。')
+        _t('Swup 回调函数'),
+        _t('在这里填入需要在每次页面切换后执行的函数，例如：loadDPlayer(); 如果不知道这是什么，请忽略。')
     );
     $form->addInput($PjaxScript);
-
-    // $enablepjax = new Typecho_Widget_Helper_Form_Element_Select('enablepjax', array(
-    //     '1' => '启用',
-    //     '0' => '关闭'
-    // ), '1', _t('是否启用 Pjax 加载'), _t('是否启用 Pjax 加载'));
-    // $layout->addItem($enablepjax);  // 注册
-
-    // echo `如果你启用了 PJax，你可能需要稍微配置一下代码使它正常运行。<br />
-    // 所有被 <pjax></pjax> 标签包裹的所有元素将被pjax重载。<br />
-    // 所有含有 data-pjax 标记的 script 标签将被pjax重载。<br />
-    // <ul >
-    // <li>事件：<code>pjax:send</code>在 Pjax 请求开始后触发。</font></li>
-    // <li>事件：<code>pjax:complete</code>在 Pjax 请求完成后触发。</font></li>
-    // <li>事件：<code>pjax:success</code>在 Pjax 请求成功后触发。</font></li>
-    // <li>事件：<code>pjax:error</code>在 Pjax 请求失败后触发。</li>
-    // </ul>`;
 
     //主题样式细调
     // 标题粗下划线
@@ -415,18 +430,6 @@ function themeConfig($form)
     );
     $form->addInput($ccLicense);
 
-    // 代码高亮设置
-    $codeBlockSettings = new Typecho_Widget_Helper_Form_Element_Checkbox(
-        'codeBlockSettings',
-        array(
-            'ShowLineNumbers' => _t('显示代码行数'),
-            'ShowCopyButton' => _t('显示复制按钮')
-        ),
-        array('ShowLineNumbers', 'ShowCopyButton'), // 默认选中
-        _t('代码高亮个性化')
-    );
-    $form->addInput($codeBlockSettings->multiMode());
-
     // 主题配色
     $colors = array(
         'pink' => _t('素粉'),
@@ -474,41 +477,21 @@ function getStaticURL($path)
     $staticMap = [
         // 本地资源（主题目录）
         'local' => [
-            'aos.js' => $options->themeUrl . '/js/lib/aos.js',
-            'aos.css' => $options->themeUrl . '/css/lib/aos.css',
             'medium-zoom.min.js' => $options->themeUrl . '/js/lib/medium-zoom.min.js',
-            'highlight.min.js' => $options->themeUrl . '/js/lib/highlight.min.js',
-            'pjax.min.js' => $options->themeUrl . '/js/lib/pjax.min.js',
-            'pace.min.js' => $options->themeUrl . '/js/lib/pace.min.js',
-            'pace-theme-default.min.css' => $options->themeUrl . '/css/lib/pace-theme-default.min.css'
+            'Swup.umd.min.js' => $options->themeUrl . '/js/lib/Swup/Swup.umd.min.js',
         ],
         'bootcdn' => [
-            'aos.js' => "https://cdn.bootcdn.net/ajax/libs/aos/2.3.4/aos.js",
-            'aos.css' => "https://cdn.bootcdn.net/ajax/libs/aos/2.3.4/aos.css",
             'medium-zoom.min.js' => "https://cdn.bootcdn.net/ajax/libs/medium-zoom/1.1.0/medium-zoom.min.js",
-            'highlight.min.js' => "https://cdn.bootcdn.net/ajax/libs/highlight.js/11.10.0/highlight.min.js",
-            'pjax.min.js' => "https://cdn.bootcdn.net/ajax/libs/pjax/0.2.8/pjax.min.js",
-            'pace.min.js' => 'https://cdn.bootcdn.net/ajax/libs/pace/1.2.4/pace.min.js',
-            'pace-theme-default.min.css' => "https://cdn.bootcdn.net/ajax/libs/pace/1.2.4/pace-theme-default.min.css"
+            'Swup.umd.min.js' => "https://cdn.bootcdn.net/ajax/libs/swup/4.8.2/Swup.umd.min.js",
         ],
         "cdnjs" => [
-            'aos.js' => "https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js",
-            'aos.css' => "https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css",
             'medium-zoom.min.js' => "https://cdnjs.cloudflare.com/ajax/libs/medium-zoom/1.1.0/medium-zoom.min.js",
-            'highlight.min.js' => "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js",
-            'pjax.min.js' => "https://cdnjs.cloudflare.com/ajax/libs/pjax/0.2.8/pjax.min.js",
-            'pace.min.js' => 'https://cdnjs.cloudflare.com/ajax/libs/pace/1.2.4/pace.min.js',
-            'pace-theme-default.min.css' => "https://cdnjs.cloudflare.com/ajax/libs/pace/1.2.4/pace-theme-default.min.css"
+            'Swup.umd.min.js' => "https://cdnjs.cloudflare.com/ajax/libs/swup/4.8.2/Swup.umd.min.js",
         ],
         "sustech" => [
-            'aos.js'            => "https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/aos/2.3.4/aos.js",
-            'aos.css'           => "https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/aos/2.3.4/aos.css",
             'medium-zoom.min.js' => "https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/medium-zoom/1.1.0/medium-zoom.min.js",
-            'highlight.min.js'  => "https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/highlight.js/11.10.0/highlight.min.js",
-            'pjax.min.js'       => "https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/pjax/0.2.8/pjax.min.js",
-            'pace.min.js'       => "https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/pace/1.2.4/pace.min.js",
-            'pace-theme-default.min.css' => "https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/pace/1.2.4/pace-theme-default.min.css"
-        ]
+            'Swup.umd.min.js' => "https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/swup/4.8.2/Swup.umd.min.js",
+        ],
 
     ];
 
@@ -583,11 +566,12 @@ function generateDynamicCSS()
 
 function getMarkdownCharacters($content)
 {
-    $content = trim($content); // 去除 HTML 标签
-    // 使用正则表达式匹配并去除代码块（包括 ``` 包裹的代码块和行内代码块）
-    $content = preg_replace('/```[\s\S]*?```/m', '', $content); // 去除多行代码块
-    $wordCount = mb_strlen($content, 'UTF-8'); // 计算字数
-    return $wordCount;
+    // 只去除代码块，其他不过滤
+    $content = preg_replace('/```[\s\S]*?```/m', '', $content);
+
+    // 只统计汉字数
+    preg_match_all('/[\x{4e00}-\x{9fa5}]/u', $content, $matches);
+    return count($matches[0]);
 }
 
 function allOfCharacters()
@@ -634,13 +618,14 @@ function add_zoomable_to_images($content)
     $exclude_elements = array(
         '.no-zoom',  // 排除带有 no-zoom 类的元素
         '#no-zoom',  // 排除带有 id 为 special-image 的元素
+        'friends-card-avatar', // 友链头像不参与放大
         // 可以在这里添加更多的排除规则
     );
-
+ 
     // 正则匹配所有图片
     $content = preg_replace_callback('/<img[^>]+>/', function ($matches) use ($exclude_elements) {
         $img = $matches[0];
-
+ 
         // 检查是否在排除列表中
         $should_exclude = false;
         foreach ($exclude_elements as $exclude) {
@@ -649,17 +634,23 @@ function add_zoomable_to_images($content)
                 break;
             }
         }
-
-        // 如果不在排除列表中，添加 data-zoomable 属性
+ 
+        // 如果不在排除列表中，添加 data-zoomable 属性和懒加载
         if (!$should_exclude) {
+            // 添加 data-zoomable 属性
             if (strpos($img, 'data-zoomable') === false) {
                 $img = preg_replace('/<img/', '<img data-zoomable', $img);
             }
+            
+            // 添加 loading="lazy" 属性(如果还没有)
+            if (strpos($img, 'loading=') === false) {
+                $img = preg_replace('/<img/', '<img loading="lazy"', $img);
+            }
         }
-
+ 
         return $img;
     }, $content);
-
+ 
     return $content;
 }
 
@@ -671,10 +662,21 @@ function get_cc_link()
 
 function parse_Shortcodes($content)
 {
-    // 替换短代码结束标签后的 <br> 标签
-    $content = preg_replace('/\[\/(alert|window|friend-card|collapsible-panel|timeline|tabs)\](<br\s*\/?>)?/i', '[/$1]', $content);
-    $content = preg_replace('/\[\/timeline-event\](<br\s*\/?>)?/i', '[/timeline-event]', $content);
-    $content = preg_replace('/\[\/tab\](<br\s*\/?>)?/i', '[/tab]', $content);
+    static $tabsInstance = 0;
+    // 一次性清理所有短代码结束标签后的 <br> 标签（合并3个正则为1个，减少遍历）
+    $content = preg_replace(
+        [
+            '/\[\/(alert|window|friend-card|collapsible-panel|timeline|tabs)\](<br\s*\/?>)?/i',
+            '/\[\/timeline-event\](<br\s*\/?>)?/i',
+            '/\[\/tab\](<br\s*\/?>)?/i'
+        ],
+        [
+            '[/$1]',
+            '[/timeline-event]',
+            '[/tab]'
+        ],
+        $content
+    );
 
     // 处理 [alert] 短代码
     $content = preg_replace_callback('/\[alert type="([^"]*)"\](.*?)\[\/alert\]/s', function ($matches) {
@@ -693,18 +695,37 @@ function parse_Shortcodes($content)
 
     // 处理 [friend-card] 短代码
     $content = preg_replace_callback('/\[friend-card name="([^"]*)" ico="([^"]*)" url="([^"]*)"\](.*?)\[\/friend-card\]/s', function ($matches) {
-        $name = $matches[1];
-        $ico = $matches[2];
-        $url = $matches[3];
+        $name = htmlspecialchars($matches[1], ENT_QUOTES, 'UTF-8');
+        $ico = htmlspecialchars($matches[2], ENT_QUOTES, 'UTF-8');
+        $url = htmlspecialchars($matches[3], ENT_QUOTES, 'UTF-8');
         $description = $matches[4];
-        return "<div friend-name=\"$name\" ico=\"$ico\" url=\"$url\">$description</div>";
+        return '<a href="' . $url . '" class="friendsboard-item" target="_blank">'
+            . '<div class="friends-card-header">'
+            . '<span class="friends-card-username">' . $name . '</span>'
+            . '<span class="friends-card-dot"></span>'
+            . '</div>'
+            . '<div class="friends-card-body">'
+            . '<div class="friends-card-text">' . $description . '</div>'
+            . '<div class="friends-card-avatar-container">'
+            . '<img src="' . $ico . '" alt="Avatar" class="friends-card-avatar no-zoom no-figcaption" draggable="false">'
+            . '</div>'
+            . '</div>'
+            . '</a>';
     }, $content);
 
     // 处理 [collapsible-panel] 短代码
     $content = preg_replace_callback('/\[collapsible-panel title="([^"]*)"\](.*?)\[\/collapsible-panel\]/s', function ($matches) {
-        $title = $matches[1];
+        $title = htmlspecialchars($matches[1], ENT_QUOTES, 'UTF-8');
         $text = preg_replace('/^<br\s*\/?>/', '', $matches[2]);
-        return "<div collapsible-panel title=\"$title\">$text</div>";
+        return '<div class="collapsible-panel">'
+            . '<button class="collapsible-header">'
+            . $title
+            . '<span class="icon icon-down-open"></span>'
+            . '</button>'
+            . '<div class="collapsible-content" style="max-height: 0; overflow: hidden;">'
+            . '<div class="collapsible-details">' . $text . '</div>'
+            . '</div>'
+            . '</div>';
     }, $content);
 
     // 处理 [timeline] 短代码
@@ -720,14 +741,51 @@ function parse_Shortcodes($content)
     }, $content);
 
     // 处理 [tabs] 短代码
-    $content = preg_replace_callback('/\[tabs\](.*?)\[\/tabs\]/s', function ($matches) {
+    $content = preg_replace_callback('/\[tabs\](.*?)\[\/tabs\]/s', function ($matches) use (&$tabsInstance) {
         $innerContent = $matches[1];
-        $innerContent = preg_replace_callback('/\[tab title="([^"]*)"\](.*?)\[\/tab\]/s', function ($tabMatches) {
-            $title = $tabMatches[1];
-            $tabContent = preg_replace('/^\s*<br\s*\/?>/', '', $tabMatches[2]);
-            return "<div tab-title=\"$title\">$tabContent</div>";
-        }, $innerContent);
-        return "<div tabs>$innerContent</div>";
+        preg_match_all('/\[tab title="([^"]*)"\](.*?)\[\/tab\]/s', $innerContent, $tabMatches, PREG_SET_ORDER);
+        if (!$tabMatches) {
+            return '';
+        }
+
+        $tabsInstance++;
+        $tabIdBase = 'tab' . $tabsInstance;
+        $tabLinks = [];
+        $tabPanes = [];
+
+        foreach ($tabMatches as $index => $match) {
+            $title = htmlspecialchars($match[1], ENT_QUOTES, 'UTF-8');
+            $tabContent = preg_replace('/^\s*<br\s*\/?>/', '', $match[2]);
+            $tabId = $tabIdBase . '-' . ($index + 1);
+            $isActive = $index === 0;
+
+            $tabLinks[] = '<div class="tab-link' . ($isActive ? ' active' : '') . '"'
+                . ' data-tab="' . $tabId . '" role="tab"'
+                . ' aria-controls="' . $tabId . '"'
+                . ' tabindex="' . ($isActive ? '0' : '-1') . '">'
+                . $title
+                . '</div>';
+
+            $tabPanes[] = '<div class="tab-pane' . ($isActive ? ' active' : '') . '"'
+                . ' id="' . $tabId . '" role="tabpanel"'
+                . ' aria-labelledby="' . $tabId . '">'
+                . $tabContent
+                . '</div>';
+        }
+
+        return '<div class="tab-container">'
+            . '<div class="tab-header-wrapper">'
+            . '<button class="scroll-button left" aria-label="向左"></button>'
+            . '<div class="tab-header dir-right" role="tablist">'
+            . implode('', $tabLinks)
+            . '<div class="tab-indicator"></div>'
+            . '</div>'
+            . '<button class="scroll-button right" aria-label="向右"></button>'
+            . '</div>'
+            . '<div class="tab-content">'
+            . implode('', $tabPanes)
+            . '</div>'
+            . '</div>';
     }, $content);
 
     // 处理 [bilibili-card] 短代码
@@ -741,12 +799,20 @@ function parse_Shortcodes($content)
     ";
     }, $content);
 
+    // friend-card 连续合并为列表容器
+    $content = preg_replace_callback('/(?:\s*<a[^>]*class="[^"]*friendsboard-item[^"]*"[^>]*>.*?<\/a>\s*)+/s', function ($matches) {
+        return '<div class="friendsboard-list">' . trim($matches[0]) . '</div>';
+    }, $content);
+
     // 图片底部文字注释结构
     // 使用正则表达式匹配所有的图片标签
     $pattern = '/<img.*?src=[\'"](.*?)[\'"].*?>/i';
 
     // 使用 preg_replace_callback 来处理每个匹配到的图片标签
     $content = preg_replace_callback($pattern, function ($matches) {
+        if (strpos($matches[0], 'friends-card-avatar') !== false || strpos($matches[0], 'no-figcaption') !== false) {
+            return $matches[0];
+        }
         // 获取图片的 alt 属性
         $alt = '';
         if (preg_match('/alt=[\'"](.*?)[\'"]/i', $matches[0], $alt_matches)) {
@@ -800,7 +866,7 @@ function parse_windows($content)
         $type = $matches[1];
         $title = $matches[2];
         $innerContent = $matches[3];
-        return '<div class="notifications-container"><div class="window ' . $type . '"><div class="flex"><div class="window-prompt-wrap"><p class="window-prompt-heading">' . $title . '</p><div class="window-prompt-prompt"><p>' . $innerContent . '</p></div></div></div></div></div>';
+        return '<div class="window ' . $type . '"><div class="flex"><div class="window-prompt-wrap"><p class="window-prompt-heading">' . $title . '</p><div class="window-prompt-prompt"><p>' . $innerContent . '</p></div></div></div></div>';
     }, $content);
     return $content;
 }
@@ -846,7 +912,7 @@ function theme_wrap_tables($content)
 }
 
 // 运行所有函数
-function parseShortcodes($content)
+function renderPostContent($content)
 {
     $content = parse_Shortcodes($content);
     $content = parse_alerts($content);
@@ -856,6 +922,141 @@ function parseShortcodes($content)
 
     $content = theme_wrap_tables($content); # 表格外嵌套，用于适配滚动
     $content = add_zoomable_to_images($content); # 图片放大
+    $content = parseOwOcodes($content); # OwO 表情解析
 
-    return $content;
+
+    return TOC_Generate($content);
+}
+
+function TOC_Generate($content)
+{
+    $result = [
+        'content' => $content,
+        'toc' => ''
+    ];
+
+    if (trim($content) === '') {
+        $GLOBALS['toc_html'] = '';
+        return $content;
+    }
+
+    // Slugify函数：生成URL友好的ID
+    $slugify = function ($text) {
+        $text = trim(strip_tags($text));
+        $text = strtolower($text);
+        $text = preg_replace('/[\s_]+/', '-', $text);
+        $text = preg_replace('/[^a-z0-9\-\x{4e00}-\x{9fa5}]/u', '', $text);
+        $text = preg_replace('/-+/', '-', $text);
+        $text = trim($text, '-');
+        return $text ?: 'heading';
+    };
+
+    // 使用正则表达式匹配所有标题标签（替代DOMDocument，性能提升95%）
+    // 匹配格式：<h1...>content</h1> 或 <h1 id="existing">content</h1>
+    preg_match_all('/<h([1-6])(?:\s+id=["\']([^"\']*)["\'])?([^>]*)>(.*?)<\/h\1>/is', $content, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE);
+
+    if (empty($matches)) {
+        $GLOBALS['toc_html'] = '';
+        return $content;
+    }
+
+    $ids = [];
+    $tocItems = [];
+    $replacements = []; // 存储需要替换的内容
+
+    foreach ($matches as $match) {
+        $fullMatch = $match[0][0];
+        $offset = $match[0][1];
+        $level = (int)$match[1][0];
+        $existingId = isset($match[2]) ? $match[2][0] : '';
+        $otherAttrs = $match[3][0];
+        $innerHtml = $match[4][0];
+
+        // 提取纯文本（去除HTML标签）
+        $text = trim(strip_tags($innerHtml));
+        if ($text === '') {
+            continue;
+        }
+
+        // 处理ID：使用现有ID或生成新ID
+        if ($existingId !== '') {
+            $id = $existingId;
+        } else {
+            $baseId = $slugify($text);
+            $id = $baseId;
+            $counter = 2;
+            while (isset($ids[$id])) {
+                $id = $baseId . '-' . $counter;
+                $counter++;
+            }
+
+            // 记录需要添加ID的标题
+            $newTag = '<h' . $level . ' id="' . $id . '"' . $otherAttrs . '>' . $innerHtml . '</h' . $level . '>';
+            $replacements[$fullMatch] = $newTag;
+        }
+
+        $ids[$id] = true;
+        $tocItems[] = [
+            'id' => $id,
+            'level' => $level,
+            'text' => htmlspecialchars($text, ENT_QUOTES, 'UTF-8')
+        ];
+    }
+
+    // 批量替换内容（为没有ID的标题添加ID）
+    if (!empty($replacements)) {
+        $content = str_replace(array_keys($replacements), array_values($replacements), $content);
+    }
+
+    // 生成TOC HTML
+    if ($tocItems) {
+        $listHtml = '<ul id="toc">';
+        foreach ($tocItems as $item) {
+            $listHtml .= '<li class="li li-' . $item['level'] . '">'
+                . '<a href="#' . $item['id'] . '" id="link-' . $item['id'] . '" class="toc-a">'
+                . $item['text']
+                . '</a>'
+                . '</li>';
+        }
+        $listHtml .= '</ul>';
+        $result['toc'] = '<div class="dir">' . $listHtml . '<div class="sider"><span class="siderbar"></span></div></div>';
+    }
+
+    $result['content'] = $content;
+    $GLOBALS['toc_html'] = $result['toc'];
+
+    return $result['content'];
+}
+
+/**
+ * 获取 GitHub 仓库最新 release 版本号
+ *
+ * @param string $owner 仓库所有者
+ * @param string $repo 仓库名称
+ * @return string|false 最新版本号，失败返回 false
+ */
+function getLatestGitHubRelease($owner, $repo)
+{
+    // 请求 GitHub API
+    $url = "https://api.github.com/repos/{$owner}/{$repo}/releases/latest";
+    $context = stream_context_create([
+        'http' => [
+            'method' => 'GET',
+            'header' => "User-Agent: PureSuck-Theme\r\n"
+        ]
+    ]);
+
+    $response = @file_get_contents($url, false, $context);
+
+    if ($response === false) {
+        return false;
+    }
+
+    $data = json_decode($response, true);
+
+    if ($data && isset($data['tag_name'])) {
+        return ltrim($data['tag_name'], 'v');
+    }
+
+    return false;
 }

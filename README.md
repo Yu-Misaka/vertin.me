@@ -42,7 +42,7 @@ Pure 意指纯洁、干净，后者取自爱人 RuoSuck，希望这份干净的�
 在 [Releases](https://github.com/MoXiaoXi233/PureSuck-theme/releases) 下载 zip 源码，解压后移动到 Typecho 主题目录。
 请确保主题文件夹名应该为 PureSuck ，否则会造成样式或者功能缺失！
 主题设置页面位置：Typecho 后台->控制台->外观->设置外观，里面有如何设置的描述  
-[CommentNotifier](https://github.com/jrotty/CommentNotifier)回调函数名：parseOwOcodes
+此邮件通知插件内置主题相同样式的邮件模板，推荐使用[CommentNotifier](https://github.com/jrotty/CommentNotifier)，表情回调函数名：parseOwOcodes
 #### 建议的工作
 - 开启 Typecho 设置内评论区的 Markdown 功能 
 - 允许使用的HTML标签和属性内填写
@@ -51,7 +51,9 @@ Pure 意指纯洁、干净，后者取自爱人 RuoSuck，希望这份干净的�
 <ol><ul><li>
 ```
 根据你自己的需要删改，你想要允许引用效果就要加上`<blockquote>`，你想要代码就要加上`<pre><code>`等等
-- **搭配字体 「霞骛文楷」 使用**
+- **搭配字体 「霞骛文楷」 使用，可以借助[SimpleFonts插件](https://github.com/MoXiaoXi233/SimpleFonts-Typecho)完成**
+- 搭配[PS_Highlight](https://github.com/MoXiaoXi233/PS-HighLight-Plugin)以及内置的`PaperSu`主题获取高性能的代码高亮功能。
+- 搭配[主题相关拓展](https://github.com/MoXiaoXi233/PureSuck-Extras)使用取得更统一的体验
 - 遇到问题联系作者
 
 ### 功能与组件
@@ -140,12 +142,9 @@ MoxToast({
 ```
 开发中····
 ## 引用库
-[aos](https://github.com/michalsnik/aos)  
 [medium-zoom](https://github.com/francoischalifour/medium-zoom)  
 [OWO.JS](https://github.com/DIYgod/OwO)  
-[HighLight.JS](https://github.com/highlightjs/highlight.js)  
-[Pjax](https://github.com/MoOx/pjax)  
-[Pace](https://github.com/CodeByZach/pace)
+
 ## License
 使用 MIT 协议开源，欢迎更多人参与/二次开发！  
 感谢使用本主题！❤
