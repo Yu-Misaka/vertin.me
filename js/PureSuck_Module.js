@@ -104,7 +104,7 @@ const initializeTOC = (() => {
         state.intersecting.clear();
 
         const activationRatio = 0.15;
-        const bottomRatio = 1;
+        const bottomRatio = 0;
         state.activationOffset = Math.round(window.innerHeight * activationRatio);
         state.observer = new IntersectionObserver(handleIntersect, {
             rootMargin: `-${activationRatio * 100}% 0px -${bottomRatio * 100}% 0px`,
@@ -156,18 +156,16 @@ const initializeTOC = (() => {
                 }
             });
 
-            // 当没有元素在激活区域内时，找到最接近激活区域的元素
-            // 这处理向上/向下滚动到页面顶部/底部的情况
-            if (bestIndex < 0 && state.topByIndex.size > 0) {
-                let closestDistance = Infinity;
-                state.topByIndex.forEach((top, index) => {
-                    if (top == null) return;
-                    const distance = Math.abs(top - state.activationOffset);
-                    if (distance < closestDistance) {
-                        closestDistance = distance;
+            // 当没有元素在激活区域内时，使用实时位置计算，避免缓存导致的抖动
+            if (bestIndex < 0) {
+                const rects = state.elements.map(el => el.getBoundingClientRect().top);
+                for (let index = 0; index < rects.length; index++) {
+                    if (rects[index] <= state.activationOffset) {
                         bestIndex = index;
+                    } else {
+                        break;
                     }
-                });
+                }
             }
 
             if (bestIndex >= 0) {

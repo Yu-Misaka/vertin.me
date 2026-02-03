@@ -698,19 +698,25 @@ function parse_Shortcodes($content)
         $name = htmlspecialchars($matches[1], ENT_QUOTES, 'UTF-8');
         $ico = htmlspecialchars($matches[2], ENT_QUOTES, 'UTF-8');
         $url = htmlspecialchars($matches[3], ENT_QUOTES, 'UTF-8');
-        $description = $matches[4];
-        return '<a href="' . $url . '" class="friendsboard-item" target="_blank">'
+        $description = preg_replace('/^<br\s*\/?>(\s*)/i', '', $matches[4]);
+        return '<!--friendsboard-item-->'
+            . '<div class="friendsboard-item">'
             . '<div class="friends-card-header">'
+            . '<a href="' . $url . '" class="friendsboard-link friendsboard-link-header" target="_blank" rel="noopener noreferrer">'
             . '<span class="friends-card-username">' . $name . '</span>'
             . '<span class="friends-card-dot"></span>'
+            . '</a>'
             . '</div>'
             . '<div class="friends-card-body">'
             . '<div class="friends-card-text">' . $description . '</div>'
             . '<div class="friends-card-avatar-container">'
+            . '<a href="' . $url . '" class="friendsboard-link friendsboard-link-avatar" target="_blank" rel="noopener noreferrer">'
             . '<img src="' . $ico . '" alt="Avatar" class="friends-card-avatar no-zoom no-figcaption" draggable="false">'
+            . '</a>'
             . '</div>'
             . '</div>'
-            . '</a>';
+            . '</div>'
+            . '<!--/friendsboard-item-->';
     }, $content);
 
     // 处理 [collapsible-panel] 短代码
@@ -800,8 +806,9 @@ function parse_Shortcodes($content)
     }, $content);
 
     // friend-card 连续合并为列表容器
-    $content = preg_replace_callback('/(?:\s*<a[^>]*class="[^"]*friendsboard-item[^"]*"[^>]*>.*?<\/a>\s*)+/s', function ($matches) {
-        return '<div class="friendsboard-list">' . trim($matches[0]) . '</div>';
+    $content = preg_replace_callback('/(?:\s*<!--friendsboard-item-->.*?<!--\/friendsboard-item-->\s*)+/s', function ($matches) {
+        $items = preg_replace('/<!--\/?friendsboard-item-->/', '', $matches[0]);
+        return '<div class="friendsboard-list">' . trim($items) . '</div>';
     }, $content);
 
     // 图片底部文字注释结构
