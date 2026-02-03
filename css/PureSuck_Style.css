@@ -387,8 +387,9 @@ h3::before {
 	top: 30px;
 }
 
-#comments>h1.comment-title::before {
+#comments-list>h1.comment-title::before {
 	content: "";
+	right: 3px;
 	display: block;
 	width: 8px;
 	height: 8px;
@@ -449,6 +450,12 @@ small {
 		top: 35px;
 	}
 
+	#comments-list>h1.comment-title::before {
+		width: 10px;
+		height: 10px;
+		top: 35px;
+	}
+
 	.h3,
 	h3 {
 		line-height: 36px
@@ -484,6 +491,12 @@ small {
 	}
 
 	h2::before {
+		width: 12px;
+		height: 12px;
+		top: 40px;
+	}
+
+	#comments-list>h1.comment-title::before {
 		width: 12px;
 		height: 12px;
 		top: 40px;
@@ -2043,7 +2056,7 @@ textarea:focus-within+.CtBoxBar {
 }
 
 .post-title::after {
-	content: "";
+	content: none;
 	position: absolute;
 	left: 0;
 	bottom: 6px;
@@ -2087,6 +2100,24 @@ textarea:focus-within+.CtBoxBar {
 	max-height: 350px;
 	object-fit: cover;
 	object-position: center;
+}
+
+/* ==================== 懒加载样式 ==================== */
+/* 懒加载图片：加载完成淡入 */
+img.lazy-loaded {
+	animation: lazy-fade-in 0.25s ease-out;
+}
+
+@keyframes lazy-fade-in {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
+
+/* 减少动画偏好 */
+@media (prefers-reduced-motion: reduce) {
+	img.lazy-loaded {
+		animation: none;
+	}
 }
 
 /* 文章版权信息卡片 */

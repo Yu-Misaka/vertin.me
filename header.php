@@ -71,6 +71,7 @@
     <link rel="stylesheet" href="<?php $this->options->themeUrl('/css/PureSuck_Module.css'); ?>">
     <link rel="stylesheet" href="<?php $this->options->themeUrl('/css/MoxDesign.css'); ?>">
     <link rel="stylesheet" href="<?php $this->options->themeUrl('/css/animations/index.css'); ?>">
+    <link rel="stylesheet" href="<?php $this->options->themeUrl('/css/OwO.min.css'); ?>">
 
     <!-- 自定义：字体-->
     <link rel="stylesheet" href="<?php $this->options->themeUrl('/css/result.css'); ?>">
@@ -85,6 +86,7 @@
     <?php if ($this->options->postTitleAfter != 'off'): ?>
         <style>
             .post-title::after {
+                content: "";
                 bottom:
                     <?php echo $this->options->postTitleAfter == 'wavyLine' ? '-5px' : '5px'; ?>
                 ;
@@ -125,6 +127,9 @@
     <script defer src="<?php getStaticURL(path: 'medium-zoom.min.js'); ?>"></script>
     <script defer src="<?php $this->options->themeUrl('/js/PureSuck_Module.js'); ?>"></script>
     <script defer src="<?php $this->options->themeUrl('/js/MoxDesign.js'); ?>"></script>
+
+    <!-- 懒加载管理器（必须在 Swup 之前加载） -->
+    <script defer src="<?php $this->options->themeUrl('/js/PureSuck_LazyLoad.js'); ?>"></script>
 
     <!-- Swup 4：页面过渡动画 -->
     <script defer src="<?php getStaticURL(path: 'Swup.umd.min.js'); ?>"></script>
